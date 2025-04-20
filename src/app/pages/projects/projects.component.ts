@@ -92,6 +92,13 @@ export default class ProjectsComponent implements OnInit {
   showAIModal: boolean = false;
   selectedProjectId: number | null = null;
 
+  // Propriétés pour le modal de confirmation
+  showConfirmModal: boolean = false;
+  confirmAction: string = '';
+  selectedProject: any = null;
+  justification: string = '';
+  justificationError: boolean = false;
+
   constructor(
     private projectService: ProjectService,
     private sanitizer: DomSanitizer
@@ -349,84 +356,91 @@ export default class ProjectsComponent implements OnInit {
   // Méthodes pour la validation et le rejet des projets
   validateProject(project: Project): void {
     if (this.isProcessing) return;
-
     
+    console.log('Validation du projet:', project);
     
-    // if (confirm(`Êtes-vous sûr de vouloir valider le projet de ${this.getPromoteurFullName(project)} ?`)) {
-    //   this.isProcessing = true;
-    //   this.statusMessage = null;
-      
-    //   // Appel API pour mettre à jour le statut
-    //   this.projectService.updateProjectStatus(project.id, 'validé')
-    //     .subscribe({
-    //       next: (response: any) => {
-    //         if (response.success) {
-    //           // Mise à jour locale du projet
-    //           project.statut = 'validé';
-    //           this.statusMessage = 'Le projet a été validé avec succès.';
-    //         } else {
-    //           this.error = response.message || 'Erreur lors de la validation du projet.';
-    //         }
-    //         this.isProcessing = false;
-            
-    //         // Faire disparaître le message après 3 secondes
-    //         setTimeout(() => {
-    //           this.statusMessage = null;
-    //           this.error = null;
-    //         }, 3000);
-    //       },
-    //       error: (error) => {
-    //         console.error('Erreur lors de la validation:', error);
-    //         this.error = 'Erreur lors de la validation du projet. Veuillez réessayer.';
-    //         this.isProcessing = false;
-            
-    //         // Faire disparaître le message d'erreur après 3 secondes
-    //         setTimeout(() => {
-    //           this.error = null;
-    //         }, 3000);
-    //       }
-    //     });
-    // }
+    // Afficher le modal de confirmation
+    this.showConfirmModal = true;
+    this.confirmAction = 'Validé';
+    this.selectedProject = project;
+    this.justification = '';
+    this.justificationError = false;
   }
   
   rejectProject(project: Project): void {
     if (this.isProcessing) return;
     
-    if (confirm(`Êtes-vous sûr de vouloir rejeter le projet de ${this.getPromoteurFullName(project)} ?`)) {
-      this.isProcessing = true;
-      this.statusMessage = null;
-      
-      // Appel API pour mettre à jour le statut
-      this.projectService.updateProjectStatus(project.id, 'rejeté')
-        .subscribe({
-          next: (response: any) => {
-            if (response.success) {
-              // Mise à jour locale du projet
-              project.statut = 'rejeté';
-              this.statusMessage = 'Le projet a été rejeté.';
-            } else {
-              this.error = response.message || 'Erreur lors du rejet du projet.';
-            }
-            this.isProcessing = false;
-            
-            // Faire disparaître le message après 3 secondes
-            setTimeout(() => {
-              this.statusMessage = null;
-              this.error = null;
-            }, 3000);
-          },
-          error: (error) => {
-            console.error('Erreur lors du rejet:', error);
-            this.error = 'Erreur lors du rejet du projet. Veuillez réessayer.';
-            this.isProcessing = false;
-            
-            // Faire disparaître le message d'erreur après 3 secondes
-            setTimeout(() => {
-              this.error = null;
-            }, 3000);
-          }
-        });
+    // Afficher le modal de confirmation
+    this.showConfirmModal = true;
+    this.confirmAction = 'Rejeté';
+    this.selectedProject = project;
+    this.justification = '';
+    this.justificationError = false;
+  }
+  
+  // Fermer le modal de confirmation
+  closeConfirmModal(): void {
+    this.showConfirmModal = false;
+    this.selectedProject = null;
+    this.justification = '';
+    this.justificationError = false;
+  }
+  
+  // Confirmer la mise à jour du statut avec justification
+  confirmStatusUpdate(): void {
+    // Vérifier que la justification est fournie
+    if (!this.justification || this.justification.trim() === '') {
+      this.justificationError = true;
+      return;
     }
+    
+    this.justificationError = false;
+    this.isProcessing = true;
+    
+    // Appel API pour mettre à jour le statut
+    this.projectService.updateProjectStatus(
+      this.selectedProject.id, 
+      this.confirmAction, 
+      this.justification.trim()
+    ).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          // Mise à jour locale du projet
+          const projectIndex = this.projects.findIndex(p => p.id === this.selectedProject.id);
+          if (projectIndex !== -1) {
+            this.projects[projectIndex].statut = this.confirmAction;
+            // Rafraîchir les listes filtrées et paginées
+            this.filteredProjects = [...this.projects];
+            this.applyFilters();
+          }
+          
+          this.statusMessage = `Le projet a été ${this.confirmAction === 'Validé' ? 'validé' : 'rejeté'} avec succès.`;
+          
+          // Fermer le modal
+          this.closeConfirmModal();
+        } else {
+          this.error = response.message || `Erreur lors de la ${this.confirmAction === 'Validé' ? 'validation' : 'rejet'} du projet.`;
+        }
+        
+        this.isProcessing = false;
+        
+        // Faire disparaître le message après 3 secondes
+        setTimeout(() => {
+          this.statusMessage = null;
+          this.error = null;
+        }, 3000);
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour:', error);
+        this.error = `Erreur lors de la ${this.confirmAction === 'Validé' ? 'validation' : 'rejet'} du projet. Veuillez réessayer.`;
+        this.isProcessing = false;
+        
+        // Faire disparaître le message d'erreur après 3 secondes
+        setTimeout(() => {
+          this.error = null;
+        }, 3000);
+      }
+    });
   }
 
   // Méthode pour obtenir l'index final des éléments affichés
@@ -494,8 +508,8 @@ export default class ProjectsComponent implements OnInit {
     if (!project) return '';
     
     switch(project.statut) {
-      case 'validé': return 'text-success';
-      case 'rejeté': return 'text-danger';
+      case 'Validé': return 'text-success';
+      case 'Rejeté': return 'text-danger';
       default: return 'text-warning';
     }
   }
@@ -505,8 +519,8 @@ export default class ProjectsComponent implements OnInit {
     if (!project) return 'Inconnu';
     
     switch(project.statut) {
-      case 'validé': return 'Validé';
-      case 'rejeté': return 'Rejeté';
+      case 'Validé': return 'Validé';
+      case 'Rejeté': return 'Rejeté';
       default: return 'En cours';
     }
   }

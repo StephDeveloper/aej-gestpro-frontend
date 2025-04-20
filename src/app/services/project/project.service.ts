@@ -23,8 +23,13 @@ export class ProjectService {
   }
 
   // Méthode pour mettre à jour le statut d'un projet
-  updateProjectStatus(projectId: number, status: string) {
-    return this.http.put(`${this.API_URL}/projets/${projectId}/status`, { statut: status });
+  updateProjectStatus(projectId: number, status: string, justification: string) {
+    const data = {
+      statut: status,
+      justification: justification
+    };
+    
+    return this.http.patch(`${this.API_URL}/projets/${projectId}`, data);
   }
 
   // Méthode pour vérifier si un fichier existe

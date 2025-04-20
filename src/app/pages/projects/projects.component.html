@@ -117,8 +117,8 @@
                             <td>
                                 <span class="badge" [ngClass]="{
                                     'bg-warning': project.statut === 'en cours',
-                                    'bg-success': project.statut === 'validé',
-                                    'bg-danger': project.statut === 'rejeté'
+                                    'bg-success': project.statut === 'Validé',
+                                    'bg-danger': project.statut === 'Rejeté'
                                 }">{{ project.statut }}</span>
                             </td>
                             <!-- Colonne des documents -->
@@ -384,6 +384,69 @@
                     [disabled]="isAIAnalysisLoading" 
                     (click)="closeAIModal()">
                 <i class="fas fa-times me-2"></i>Fermer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation (Validation/Rejet) -->
+<div class="confirmation-modal" *ngIf="showConfirmModal">
+    <div class="confirmation-modal-overlay" (click)="closeConfirmModal()"></div>
+    <div class="confirmation-modal-content">
+        <div class="confirmation-modal-header" [ngClass]="{'bg-success-subtle': confirmAction === 'Validé', 'bg-danger-subtle': confirmAction === 'Rejeté'}">
+            <h5 class="confirmation-modal-title">
+                <i [class]="confirmAction === 'Validé' ? 'fas fa-check-circle me-2 text-success' : 'fas fa-times-circle me-2 text-danger'"></i>
+                {{ confirmAction === 'Validé' ? 'Validation du projet' : 'Rejet du projet' }}
+            </h5>
+            <button type="button" class="btn-close" (click)="closeConfirmModal()"></button>
+        </div>
+        
+        <div class="confirmation-modal-body">
+            <p class="mb-3">
+                {{ confirmAction === 'Validé' ? 
+                    'Vous êtes sur le point de valider le projet de ' : 
+                    'Vous êtes sur le point de rejeter le projet de ' }}
+                <strong>{{ selectedProject?.nom }} {{ selectedProject?.prenoms }}</strong>.
+            </p>
+            
+            <div class="form-group mb-3">
+                <label for="justification" class="form-label">
+                    {{ confirmAction === 'Validé' ? 
+                        'Veuillez fournir une justification pour cette validation' : 
+                        'Veuillez expliquer les raisons de ce rejet' }}
+                    <span class="text-danger">*</span>
+                </label>
+                <textarea 
+                    id="justification" 
+                    class="form-control" 
+                    [(ngModel)]="justification" 
+                    rows="5" 
+                    placeholder="{{ confirmAction === 'Validé' ? 
+                        'Ex: Projet très prometteur. Nous suggérons d\'établir un plan marketing plus détaillé...' : 
+                        'Ex: Le projet manque de viabilité économique dans le contexte actuel...' }}">
+                </textarea>
+                <small class="text-muted">Cette justification sera enregistrée avec la décision.</small>
+            </div>
+            
+            <div *ngIf="justificationError" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Veuillez fournir une justification avant de confirmer.
+            </div>
+        </div>
+        
+        <div class="confirmation-modal-footer">
+            <button 
+                type="button" 
+                class="btn" 
+                [ngClass]="{'btn-success': confirmAction === 'Validé', 'btn-danger': confirmAction === 'Rejeté'}"
+                [disabled]="isProcessing" 
+                (click)="confirmStatusUpdate()">
+                <i [class]="confirmAction === 'Validé' ? 'fas fa-check me-2' : 'fas fa-times me-2'"></i>
+                {{ confirmAction === 'Validé' ? 'Confirmer la validation' : 'Confirmer le rejet' }}
+                <span *ngIf="isProcessing" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" [disabled]="isProcessing" (click)="closeConfirmModal()">
+                Annuler
             </button>
         </div>
     </div>
