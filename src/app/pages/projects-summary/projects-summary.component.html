@@ -28,7 +28,7 @@
                         <input 
                             type="text" 
                             class="form-control" 
-                            placeholder="Rechercher un projet..." 
+                            placeholder="Rechercher un promoteur..." 
                             [(ngModel)]="searchTerm"
                             (input)="applyFilters()">
                     </div>
@@ -36,7 +36,7 @@
                 
                 <!-- Filtre par statut -->
                 <div class="col-md-4">
-                    <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+                    <select class="form-select form-control" [(ngModel)]="selectedStatus" (change)="applyFilters()">
                         <option value="">Tous les statuts</option>
                         <option value="Validé">Validés</option>
                         <option value="Rejeté">Rejetés</option>
@@ -90,10 +90,10 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle bg-primary text-white me-2">
-                                        {{ project.nom.charAt(0) }}{{ project.prenoms.charAt(0) }}
+                                        {{ project.nom.charAt(0) | uppercase }}{{ project.prenoms.charAt(0) | uppercase }}
                                     </div>
                                     <div>
-                                        <div class="fw-medium">{{ getPromoteurFullName(project) }}</div>
+                                        <div class="fw-medium">{{ getPromoteurFullName(project) | titlecase }}</div>
                                         <small class="text-muted">{{ project.email }}</small>
                                     </div>
                                 </div>
@@ -112,7 +112,7 @@
                                     'bg-danger': project.statut === 'Rejeté'
                                 }">{{ project.statut }}</span>
                             </td>
-                            <td>{{ formatDate(project.created_at) }}</td>
+                            <td>{{ project.created_at | date:'dd/MM/yyyy' }}</td>
                             <!-- Colonne des documents -->
                             <td>
                                 <div class="document-icons">
@@ -137,10 +137,6 @@
                             <td class="text-center">
                                 <button class="btn btn-sm btn-primary me-1" (click)="generatePDF(project)">
                                     <i class="fas fa-file-pdf me-1"></i>PDF
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" title="Voir la justification"
-                                        *ngIf="project.justification">
-                                    <i class="fas fa-info-circle"></i>
                                 </button>
                             </td>
                         </tr>

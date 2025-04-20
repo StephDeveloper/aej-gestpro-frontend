@@ -473,9 +473,9 @@ export default class ProjectsComponent implements OnInit {
   
   closeAIModal() {
     // Empêcher la fermeture du modal si l'analyse est en cours
-    if (this.isAIAnalysisLoading) {
-      return;
-    }
+    // if (this.isAIAnalysisLoading) {
+    //   return;
+    // }
     this.showAIModal = false;
   }
   
