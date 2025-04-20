@@ -1,8 +1,138 @@
 <div class="page-inner">
-    <div class="page-header">
-        <h3 class="fw-bold mb-3">Gestion des Projets</h3>
-        <div class="row">
-            
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Gestion des Projets</h3>
+        <button class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Nouveau Projet
+        </button>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Recherche par nom/prénom -->
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            placeholder="Rechercher par nom ou prénom..." 
+                            [(ngModel)]="searchTerm"
+                            (input)="applyFilters()">
+                    </div>
+                </div>
+                
+                <!-- Filtre par type de projet -->
+                <div class="col-md-3">
+                    <select class="form-select form-control" [(ngModel)]="selectedType" (change)="applyFilters()">
+                        <option value="">Tous les types de projets</option>
+                        <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
+                    </select>
+                </div>
+                
+                <!-- Filtre par statut -->
+                <div class="col-md-3">
+                    <select class="form-select form-control" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+                        <option value="">Tous les statuts</option>
+                        <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+                    </select>
+                </div>
+                
+                <!-- Bouton de réinitialisation -->
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+                        <i class="fas fa-redo-alt me-1"></i> Réinitialiser
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message de chargement -->
+    <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+    </div>
+
+    <!-- Tableau des projets -->
+    <div *ngIf="!isLoading && !error" class="card shadow">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="cursor-pointer" (click)="sortProjects('nom')">Promoteur <i class="fas fa-sort text-muted ms-1"></i></th>
+                            <th class="cursor-pointer" (click)="sortProjects('type_projet')">Type de Projet <i class="fas fa-sort text-muted ms-1"></i></th>
+                            <th class="cursor-pointer" (click)="sortProjects('forme_juridique')">Forme Juridique</th>
+                            <th class="cursor-pointer" (click)="sortProjects('statut')">Statut</th>
+                            <th class="cursor-pointer" (click)="sortProjects('created_at')">Date d'inscription</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="filteredProjects.length === 0">
+                            <td colspan="7" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                    <h5>Aucun projet trouvé</h5>
+                                    <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngFor="let project of filteredProjects">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle bg-primary text-white me-2">
+                                        {{ project.nom.charAt(0) }}{{ project.prenoms.charAt(0) }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">{{ getPromoteurFullName(project) }}</div>
+                                        <div class="small text-muted">{{ project.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-success': project.type_projet === 'En Création',
+                                    'bg-info': project.type_projet === 'En Développement',
+                                    'bg-warning': project.type_projet !== 'En Création' && project.type_projet !== 'En Développement'
+                                }">{{ project.type_projet }}</span>
+                            </td>
+                            <td>{{ project.forme_juridique }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-warning': project.statut === 'en cours',
+                                    'bg-success': project.statut === 'validé',
+                                    'bg-danger': project.statut === 'rejeté'
+                                }">{{ project.statut }}</span>
+                            </td>
+                            <td>{{ project.created_at | date:'dd/MM/yyyy' }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

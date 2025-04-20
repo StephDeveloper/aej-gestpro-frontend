@@ -1,0 +1,91 @@
+// Styles pour la page des projets
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+// Styles pour le tableau
+.table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}
+
+// Avatar pour les promoteurs
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+// Style pour l'état vide
+.empty-state {
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Animations pour les transitions
+.card {
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+// Badges responsive
+.badge {
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+// Améliorations des boutons d'action
+.btn-group .btn {
+  transition: all 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Animation du filtre
+.form-select, .form-control {
+  transition: border-color 0.2s, box-shadow 0.2s;
+  
+  &:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+  }
+}
+
+// Ajustements responsifs
+@media (max-width: 768px) {
+  .row.g-3 > div {
+    margin-bottom: 0.5rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+  
+  .avatar-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+}
