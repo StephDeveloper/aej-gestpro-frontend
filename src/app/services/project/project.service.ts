@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environnement } from '../../environnement/environnement';
 import { HttpClientService } from '../http-client/http-client.service';
+import { catchError, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,7 @@ export class ProjectService {
 
   constructor(private http: HttpClientService) { }
 
-  getProjects() {
+  getProjects(): Observable<any> {
     return this.http.get(`${this.API_URL}/projets`);
   }
 
@@ -20,7 +22,20 @@ export class ProjectService {
     return this.http.post(`${this.API_URL}/projets`, project, options);
   }
 
-  
+  // Méthode pour mettre à jour le statut d'un projet
+  updateProjectStatus(projectId: number, status: string) {
+    return this.http.put(`${this.API_URL}/projets/${projectId}/status`, { statut: status });
+  }
+
+  // Méthode pour vérifier si un fichier existe
+  checkFileExists(url: string): Observable<boolean> {
+    // Utiliser get au lieu de head car le service personnalisé pourrait ne pas implémenter head
+    return this.http.get(url, { responseType: 'blob' })
+      .pipe(
+        map(() => true),
+        catchError(() => of(false))
+      );
+  }
 }
 
 // Fonction utilitaire pour vérifier si l'objet est un FormData
