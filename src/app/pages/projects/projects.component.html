@@ -1,8 +1,8 @@
 <div class="page-inner">
     <div class="page-header d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold">Gestion des Projets</h3>
-        <button class="btn btn-primary">
-            <i class="fas fa-plus-circle me-2"></i>Nouveau Projet
+        <button type="button" class="btn btn-primary" (click)="AIAnalysis()">
+            <i class="fas fa-brain me-2"></i>Analyser les projets grâce à l'IA
         </button>
     </div>
 
@@ -264,6 +264,125 @@
                 <i class="fas fa-download me-2"></i>Télécharger
             </a>
             <button type="button" class="btn btn-secondary" (click)="closeFileModal()">
+                <i class="fas fa-times me-2"></i>Fermer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour l'analyse IA -->
+<div class="ai-modal" *ngIf="showAIModal">
+    <div class="ai-modal-overlay" [class.loading]="isAIAnalysisLoading" (click)="isAIAnalysisLoading ? $event.preventDefault() : closeAIModal()"></div>
+    <div class="ai-modal-content">
+        <div class="ai-modal-header">
+            <h5 class="ai-modal-title">
+                <i class="fas fa-brain me-2"></i>Analyse des projets par Intelligence Artificielle
+            </h5>
+            <button type="button" class="btn-close" [disabled]="isAIAnalysisLoading" (click)="closeAIModal()"></button>
+        </div>
+        
+        <!-- Loader pendant le chargement -->
+        <div *ngIf="isAIAnalysisLoading" class="ai-modal-body d-flex justify-content-center align-items-center">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <h5 class="fw-normal text-muted">Analyse des projets en cours...</h5>
+                <p class="text-muted small">Notre IA évalue les plans d'affaires. Cette opération peut prendre un certains temps, veuillez patienter...</p>
+            </div>
+        </div>
+        
+        <!-- Contenu du modal une fois les données chargées -->
+        <div *ngIf="!isAIAnalysisLoading" class="ai-modal-body">
+            <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle me-2"></i> 
+                L'IA a analysé les plans d'affaires des projets et les a classés selon leur potentiel.
+            </div>
+            
+            <!-- Tableau des résultats -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover ai-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-center">Rang</th>
+                            <th scope="col">Promoteur</th>
+                            <th scope="col">Projet</th>
+                            <th scope="col" class="text-center">Score</th>
+                            <th scope="col">Recommandations</th>
+                            <th scope="col" class="text-center">Statut</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of projectsAI">
+                            <td class="text-center fw-bold">{{ item.rang }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle bg-primary text-white me-2 small-avatar">
+                                        {{ item.projet.nom.charAt(0) }}{{ item.projet.prenoms.charAt(0) }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">{{ item.projet.nom }} {{ item.projet.prenoms }}</div>
+                                        <div class="small text-muted">{{ item.projet.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-success': item.projet.type_projet === 'En Création',
+                                    'bg-info': item.projet.type_projet === 'En Développement',
+                                    'bg-warning': item.projet.type_projet !== 'En Création' && item.projet.type_projet !== 'En Développement'
+                                }">{{ item.projet.type_projet }}</span>
+                                <div class="small text-muted">{{ item.projet.forme_juridique }}</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="score-badge" [ngClass]="{
+                                    'score-low': item.analyse.note_globale < 40,
+                                    'score-medium': item.analyse.note_globale >= 40 && item.analyse.note_globale < 70,
+                                    'score-high': item.analyse.note_globale >= 70
+                                }">
+                                    {{ item.analyse.note_globale }}/100
+                                </div>
+                            </td>
+                            <td>
+                                <div class="recommendations-text">
+                                    {{ item.analyse.recommandations }}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="fw-medium" [ngClass]="getProjectStatusClass(item.projet.id)">
+                                    {{ getProjectStatus(item.projet.id) }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center">
+                                    <!-- Bouton Valider -->
+                                    <button class="btn btn-sm btn-success me-2" 
+                                            title="Valider ce projet"
+                                            (click)="validateProjectFromAI(item.projet.id)"
+                                            [disabled]="isProcessing || getProjectStatus(item.projet.id) === 'Validé'">
+                                        <i class="fas fa-check me-1"></i>Valider
+                                    </button>
+                                    
+                                    <!-- Bouton Rejeter -->
+                                    <button class="btn btn-sm btn-danger" 
+                                            title="Rejeter ce projet"
+                                            (click)="rejectProjectFromAI(item.projet.id)"
+                                            [disabled]="isProcessing || getProjectStatus(item.projet.id) === 'Rejeté'">
+                                        <i class="fas fa-times me-1"></i>Rejeter
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="ai-modal-footer">
+            <button type="button" class="btn btn-secondary" 
+                    [disabled]="isAIAnalysisLoading" 
+                    (click)="closeAIModal()">
                 <i class="fas fa-times me-2"></i>Fermer
             </button>
         </div>

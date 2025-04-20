@@ -5,6 +5,8 @@ import { ProjectService } from '../../services/project/project.service';
 import { environnement } from '../../environnement/environnement';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
+declare var $: any;
+
 export interface Project {
   id: number;
   nom: string;
@@ -24,6 +26,23 @@ export interface Project {
   cni_url?: string;
   piece_identite_url?: string;
   plan_affaire_url?: string;
+}
+
+export interface ProjectAI {
+  projet: {
+    id: number;
+    nom: string;
+    prenoms: string;
+    email: string;
+    type_projet: string;
+    forme_juridique: string;
+    created_at: string;
+  };
+  analyse: {
+    note_globale: number;
+    recommandations: string;
+  };
+  rang: number;
 }
 
 @Component({
@@ -67,6 +86,11 @@ export default class ProjectsComponent implements OnInit {
   // Pour la gestion des statuts
   isProcessing: boolean = false;
   statusMessage: string | null = null;
+
+  projectsAI: ProjectAI[] = [];
+  isAIAnalysisLoading: boolean = false;
+  showAIModal: boolean = false;
+  selectedProjectId: number | null = null;
 
   constructor(
     private projectService: ProjectService,
@@ -325,42 +349,44 @@ export default class ProjectsComponent implements OnInit {
   // Méthodes pour la validation et le rejet des projets
   validateProject(project: Project): void {
     if (this.isProcessing) return;
+
     
-    if (confirm(`Êtes-vous sûr de vouloir valider le projet de ${this.getPromoteurFullName(project)} ?`)) {
-      this.isProcessing = true;
-      this.statusMessage = null;
+    
+    // if (confirm(`Êtes-vous sûr de vouloir valider le projet de ${this.getPromoteurFullName(project)} ?`)) {
+    //   this.isProcessing = true;
+    //   this.statusMessage = null;
       
-      // Appel API pour mettre à jour le statut
-      this.projectService.updateProjectStatus(project.id, 'validé')
-        .subscribe({
-          next: (response: any) => {
-            if (response.success) {
-              // Mise à jour locale du projet
-              project.statut = 'validé';
-              this.statusMessage = 'Le projet a été validé avec succès.';
-            } else {
-              this.error = response.message || 'Erreur lors de la validation du projet.';
-            }
-            this.isProcessing = false;
+    //   // Appel API pour mettre à jour le statut
+    //   this.projectService.updateProjectStatus(project.id, 'validé')
+    //     .subscribe({
+    //       next: (response: any) => {
+    //         if (response.success) {
+    //           // Mise à jour locale du projet
+    //           project.statut = 'validé';
+    //           this.statusMessage = 'Le projet a été validé avec succès.';
+    //         } else {
+    //           this.error = response.message || 'Erreur lors de la validation du projet.';
+    //         }
+    //         this.isProcessing = false;
             
-            // Faire disparaître le message après 3 secondes
-            setTimeout(() => {
-              this.statusMessage = null;
-              this.error = null;
-            }, 3000);
-          },
-          error: (error) => {
-            console.error('Erreur lors de la validation:', error);
-            this.error = 'Erreur lors de la validation du projet. Veuillez réessayer.';
-            this.isProcessing = false;
+    //         // Faire disparaître le message après 3 secondes
+    //         setTimeout(() => {
+    //           this.statusMessage = null;
+    //           this.error = null;
+    //         }, 3000);
+    //       },
+    //       error: (error) => {
+    //         console.error('Erreur lors de la validation:', error);
+    //         this.error = 'Erreur lors de la validation du projet. Veuillez réessayer.';
+    //         this.isProcessing = false;
             
-            // Faire disparaître le message d'erreur après 3 secondes
-            setTimeout(() => {
-              this.error = null;
-            }, 3000);
-          }
-        });
-    }
+    //         // Faire disparaître le message d'erreur après 3 secondes
+    //         setTimeout(() => {
+    //           this.error = null;
+    //         }, 3000);
+    //       }
+    //     });
+    // }
   }
   
   rejectProject(project: Project): void {
@@ -406,5 +432,82 @@ export default class ProjectsComponent implements OnInit {
   // Méthode pour obtenir l'index final des éléments affichés
   getEndIndex(): number {
     return Math.min(this.currentPage * this.pageSize, this.filteredProjects.length);
+  }
+
+  AIAnalysis() {
+    this.isAIAnalysisLoading = true;
+    this.showAIModal = true;
+    
+    this.projectService.getProjectsAI().subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.projectsAI = response.data;
+          console.log('Analyse IA:', this.projectsAI);
+        } else {
+          console.error('Erreur de réponse:', response.message);
+        }
+        this.isAIAnalysisLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors de l\'analyse:', error);
+        this.isAIAnalysisLoading = false;
+        this.error = 'Erreur lors de l\'analyse IA des projets. Veuillez réessayer.';
+        setTimeout(() => this.error = null, 3000);
+      }
+    });
+  }
+  
+  closeAIModal() {
+    // Empêcher la fermeture du modal si l'analyse est en cours
+    if (this.isAIAnalysisLoading) {
+      return;
+    }
+    this.showAIModal = false;
+  }
+  
+  validateProjectFromAI(projectId: number) {
+    if (this.isProcessing) return;
+    
+    const project = this.projects.find(p => p.id === projectId);
+    if (project) {
+      this.validateProject(project);
+    } else {
+      this.error = 'Projet non trouvé dans la liste principale.';
+      setTimeout(() => this.error = null, 3000);
+    }
+  }
+  
+  rejectProjectFromAI(projectId: number) {
+    if (this.isProcessing) return;
+    
+    const project = this.projects.find(p => p.id === projectId);
+    if (project) {
+      this.rejectProject(project);
+    } else {
+      this.error = 'Projet non trouvé dans la liste principale.';
+      setTimeout(() => this.error = null, 3000);
+    }
+  }
+  
+  getProjectStatusClass(projectId: number): string {
+    const project = this.projects.find(p => p.id === projectId);
+    if (!project) return '';
+    
+    switch(project.statut) {
+      case 'validé': return 'text-success';
+      case 'rejeté': return 'text-danger';
+      default: return 'text-warning';
+    }
+  }
+  
+  getProjectStatus(projectId: number): string {
+    const project = this.projects.find(p => p.id === projectId);
+    if (!project) return 'Inconnu';
+    
+    switch(project.statut) {
+      case 'validé': return 'Validé';
+      case 'rejeté': return 'Rejeté';
+      default: return 'En cours';
+    }
   }
 }

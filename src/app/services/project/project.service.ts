@@ -36,6 +36,10 @@ export class ProjectService {
         catchError(() => of(false))
       );
   }
+
+  getProjectsAI() {
+    return this.http.get(`${this.API_URL}/projets/classement`);
+  }
 }
 
 // Fonction utilitaire pour vérifier si l'objet est un FormData
