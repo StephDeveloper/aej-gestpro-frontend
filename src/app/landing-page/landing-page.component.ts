@@ -3,6 +3,8 @@ import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth/auth.service';
+import { finalize } from 'rxjs';
+import { ProjectService } from '../services/project/project.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -16,19 +18,17 @@ export default class LandingPageComponent implements OnInit {
   error = '';
   isLoading = false;
   submitted = false;
+  successMessage = false;
 
   formesJuridiques: string[] = [
+    'SCS',
+    'SNC',
     'SARL', 
     'SA', 
-    'SAS', 
-    'EURL', 
-    'Auto-entrepreneur', 
-    'Association', 
-    'Coopérative',
-    'Autre'
+    'SAS'
   ];
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(private fb: FormBuilder, private projectService: ProjectService, private router: Router) {}
 
   ngOnInit() {
     this.initForm();
@@ -69,15 +69,15 @@ export default class LandingPageComponent implements OnInit {
       const control = this.inscriptionForm.get(controlName);
       
       // Validation de type de fichier
-      const allowedImageTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+      const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
       const allowedPdfType = ['application/pdf'];
       
       let isValidType = false;
-      let maxSize = 5 * 1024 * 1024; // 5MB par défaut
+      let maxSize = 1 * 1024 * 1024; // 1MB par défaut
       
       if (controlName === 'planAffaires') {
         isValidType = allowedPdfType.includes(file.type);
-        maxSize = 10 * 1024 * 1024; // 10MB pour le plan d'affaires
+        maxSize = 1 * 1024 * 1024; // 1MB pour le plan d'affaires
       } else {
         isValidType = allowedImageTypes.includes(file.type);
       }
@@ -123,12 +123,59 @@ export default class LandingPageComponent implements OnInit {
     });
 
     this.isLoading = true;
-    this.authService.register(formData).subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
+    this.projectService.createProject(formData)
+    .pipe(finalize(() => this.isLoading = false))
+    .subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.successMessage = true;
+          this.error = '';
+          this.submitted = false;
+          
+          // Réinitialiser complètement le formulaire
+          this.inscriptionForm.reset();
+          
+          // Réinitialiser les champs de type fichier
+          this.resetFileInputs();
+          
+          // Faire défiler vers le haut du formulaire pour montrer le message de succès
+          setTimeout(() => {
+            const inscriptionElement = document.getElementById('inscription');
+            if (inscriptionElement) {
+              inscriptionElement.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+          }, 200);
+        }
       },
       error: (error: any) => {
         this.error = error.error.message;
+      }
+    });
+  }
+
+  /**
+   * Réinitialise tous les champs de type fichier du formulaire
+   */
+  resetFileInputs() {
+    // Obtenir tous les éléments input de type file
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    
+    // Réinitialiser chaque input
+    fileInputs.forEach((element: Element) => {
+      const input = element as HTMLInputElement;
+      input.value = '';
+    });
+    
+    // Réinitialiser également les validations dans le formulaire pour les champs de fichier
+    ['cni', 'piece_identite', 'plan_affaire'].forEach(fieldName => {
+      const control = this.inscriptionForm.get(fieldName);
+      if (control) {
+        control.setValue(null);
+        control.markAsUntouched();
+        control.updateValueAndValidity();
       }
     });
   }

@@ -401,6 +401,12 @@ input[type="file"].form-control {
   text-align: center;
 }
 
+.submit-msg-success {
+  margin-bottom: 3rem;
+  border-top: 1px solid rgba($border-color, 0.7);
+  text-align: center;
+}
+
 // Footer
 .footer {
   background: $primary-dark;

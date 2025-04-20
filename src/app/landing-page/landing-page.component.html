@@ -63,13 +63,14 @@
           <div class="form-header">
             <h4 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Formulaire d'Inscription</h4>
           </div>
-          
           <form novalidate [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
-            @if (error) {
-              <div class="col-12">
-                <div class="alert alert-danger">{{ error }}</div>
-              </div>
-            }
+            <div class="submit-msg-success">
+              @if (successMessage) {
+                <div class="alert alert-success">
+                  <span class="text-success fw-bold">Succès!</span> Votre projet a été soumis avec succès.
+                </div>
+              }
+            </div>
             <!-- Informations personnelles -->
             <div class="row">
               <div class="col-12 mb-3">
@@ -166,6 +167,9 @@
                   <div class="invalid-feedback">
                     @if (f['email'].errors['required']) {
                       <span>L'email est requis</span>
+                    }
+                    @if (f['email'].errors['email']) {
+                      <span>L'email est invalide</span>
                     }
                   </div>
                 }
@@ -264,9 +268,13 @@
                     }
                   </div>
                 }
-                  <div *ngIf="inscriptionForm.get('cni')?.errors?.['invalidFileType']">Format de fichier non valide</div>
-                  <div *ngIf="inscriptionForm.get('cni')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
-                <small class="form-text text-muted">Formats acceptés: PDF, JPG, PNG (Max: 5 MB)</small>
+                @if (inscriptionForm.get('cni')?.errors?.['invalidFileType']) {
+                  <div class="text-danger">Format de fichier non valide</div>
+                }
+                @if (inscriptionForm.get('cni')?.errors?.['invalidFileSize']) {
+                  <div class="text-danger">Taille du fichier trop grande</div>
+                }
+                <small class="form-text text-muted">Formats acceptés: PDF, JPEG, JPG, PNG (Max: 1 Mo)</small>
               </div>
 
               <div class="col-md-4 form-group">
@@ -285,9 +293,13 @@
                     }
                   </div>
                 }
-                  <div *ngIf="inscriptionForm.get('piece_identite')?.errors?.['invalidFileType']">Format de fichier non valide</div>
-                  <div *ngIf="inscriptionForm.get('piece_identite')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
-                  <small class="form-text text-muted">Formats acceptés: PDF, JPG, PNG (Max: 5 MB)</small>
+                @if (inscriptionForm.get('piece_identite')?.errors?.['invalidFileType']) {
+                  <div class="text-danger">Format de fichier non valide</div>
+                }
+                @if (inscriptionForm.get('piece_identite')?.errors?.['invalidFileSize']) {
+                  <div class="text-danger">Taille du fichier trop grande</div>
+                }
+                <small class="form-text text-muted">Formats acceptés: PDF, JPEG, JPG, PNG (Max: 1 Mo)</small>
               </div>
 
               <div class="col-md-4 form-group">
@@ -306,9 +318,13 @@
                     }
                   </div>
                 }
-                <div *ngIf="inscriptionForm.get('plan_affaire')?.errors?.['invalidFileType']">Format de fichier non valide</div>
-                <div *ngIf="inscriptionForm.get('plan_affaire')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
-                <small class="form-text text-muted">Formats acceptés: PDF (Max: 10 MB)</small>
+                @if (inscriptionForm.get('plan_affaire')?.errors?.['invalidFileType']) {
+                  <div class="text-danger">Format de fichier non valide</div>
+                }
+                @if (inscriptionForm.get('plan_affaire')?.errors?.['invalidFileSize']) {
+                  <div class="text-danger">Taille du fichier trop grande</div>
+                }
+                <small class="form-text text-muted">Formats acceptés: PDF (Max: 1 Mo)</small>
               </div>
             </div>
 
@@ -320,6 +336,11 @@
                 Soumettre mon projet
               </button>
             </div>
+            @if (error) {
+              <div class="mt-4 col-12">
+                <div class="alert alert-danger">{{ error }}</div>
+              </div>
+            }
           </form>
         </div>
       </div>
