@@ -33,7 +33,7 @@
     }
   }
   
-  .card-info {
+  .text-white {
     flex: 1;
     
     .card-value {
@@ -41,12 +41,11 @@
       font-weight: 700;
       margin: 0;
       line-height: 1.2;
-      color: white;
     }
     
     .card-label {
       font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.8);
+      opacity: 0.8;
       margin: 0;
     }
   }
@@ -300,7 +299,7 @@
       }
     }
     
-    .card-info {
+    .text-white {
       .card-value {
         font-size: 1.6rem;
       }

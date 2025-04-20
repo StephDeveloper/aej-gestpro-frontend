@@ -71,113 +71,98 @@
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="row g-3 mb-4">
-            <!-- Status Chart -->
-            <div class="col-lg-4">
+        <!-- Graphiques - 1ère rangée -->
+        <div class="row mt-4">
+            <!-- Graphique de statut -->
+            <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-white">
-                        <h5 class="mb-0">Répartition par Statut</h5>
+                        <h5 class="card-title mb-0">Statut des projets</h5>
                     </div>
                     <div class="card-body d-flex align-items-center justify-content-center">
-                        <div class="chart-container">
-                            <svg width="200" height="200" viewBox="0 0 100 100" class="donut-chart">
-                                <!-- Background circle -->
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f1f1" stroke-width="10"/>
-                                
-                                <!-- We'll create pie slices manually for better control -->
-                                <ng-container *ngIf="dashboardData.projets_par_statut">
-                                    <!-- Calculate angles and draw arcs -->
-                                    <ng-container *ngFor="let status of ['Validé', 'Rejeté', 'en cours']; let i = index">
-                                        <ng-container *ngIf="dashboardData.projets_par_statut[status]">
-                                            <!-- Calculate percentage -->
-                                            <circle 
-                                                cx="50" 
-                                                cy="50" 
-                                                r="40" 
-                                                fill="none" 
-                                                [attr.stroke]="statusColors[status]" 
-                                                stroke-width="10"
-                                                [attr.stroke-dasharray]="getStrokeDashArray(getPercentage(dashboardData.projets_par_statut[status], dashboardData.total_projets))"
-                                                stroke-dashoffset="0"
-                                                transform="rotate(-90 50 50)"
-                                                class="donut-segment"
-                                            />
-                                            <!-- Calcule l'angle pour le placement du label en fonction du pourcentage -->
-                                            <ng-container *ngIf="getPercentage(dashboardData.projets_par_statut[status], dashboardData.total_projets) as percentage">
-                                                <g class="chart-label" [attr.transform]="'translate(' + (50 + 30 * Math.cos((-90 + percentage/2) * Math.PI/180)) + ',' + (50 + 30 * Math.sin((-90 + percentage/2) * Math.PI/180)) + ')'">
-                                                    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" class="chart-percentage">{{ percentage }}%</text>
-                                                </g>
-                                            </ng-container>
-                                        </ng-container>
-                                    </ng-container>
-                                </ng-container>
-                                <text x="50" y="50" text-anchor="middle" dominant-baseline="middle" class="chart-label">Statut</text>
-                            </svg>
-                            
-                            <!-- Legend -->
-                            <div class="chart-legend">
-                                <div class="legend-item" *ngFor="let status of ['Validé', 'Rejeté', 'en cours']">
-                                    <span class="legend-color" [style.background-color]="statusColors[status]"></span>
-                                    <span class="legend-label">{{ status }}</span>
-                                    <span class="legend-value">{{ dashboardData.projets_par_statut[status] || 0 }}</span>
-                                </div>
+                        <div *ngIf="isLoading" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
                             </div>
                         </div>
+                        <div *ngIf="error" class="text-center py-5 text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <p>Erreur lors du chargement des données</p>
+                        </div>
+                        <apx-chart 
+                            *ngIf="!isLoading && !error"
+                            #statusChart
+                            [series]="statusChartOptions.series!"
+                            [chart]="statusChartOptions.chart!"
+                            [labels]="statusChartOptions.labels!"
+                            [colors]="statusChartOptions.colors!"
+                            [responsive]="statusChartOptions.responsive!"
+                            [dataLabels]="statusChartOptions.dataLabels!"
+                            [legend]="statusChartOptions.legend!"
+                        ></apx-chart>
                     </div>
                 </div>
             </div>
 
-            <!-- Project Type Chart -->
-            <div class="col-lg-4">
+            <!-- Graphique de type de projet -->
+            <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-white">
-                        <h5 class="mb-0">Types de Projets</h5>
+                        <h5 class="card-title mb-0">Types de projets</h5>
                     </div>
                     <div class="card-body d-flex align-items-center justify-content-center">
-                        <div class="chart-container">
-                            <div class="horizontal-chart">
-                                <div class="chart-bars">
-                                    <ng-container *ngFor="let type of getObjectKeys(dashboardData.projets_par_type)">
-                                        <div class="chart-bar-container">
-                                            <div class="chart-bar-label">{{ type }}</div>
-                                            <div class="chart-bar-wrapper">
-                                                <div class="chart-bar" 
-                                                     [style.width.%]="getPercentage(dashboardData.projets_par_type[type], dashboardData.total_projets)"
-                                                     [style.background-color]="typeColors[type] || '#0dcaf0'">
-                                                    <span class="chart-bar-value">{{ dashboardData.projets_par_type[type] }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="chart-bar-percentage">
-                                                {{ getPercentage(dashboardData.projets_par_type[type], dashboardData.total_projets) }}%
-                                            </div>
-                                        </div>
-                                    </ng-container>
-                                </div>
+                        <div *ngIf="isLoading" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
                             </div>
                         </div>
+                        <div *ngIf="error" class="text-center py-5 text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <p>Erreur lors du chargement des données</p>
+                        </div>
+                        <apx-chart 
+                            *ngIf="!isLoading && !error"
+                            #typeChart
+                            [series]="typeChartOptions.series!"
+                            [chart]="typeChartOptions.chart!"
+                            [dataLabels]="typeChartOptions.dataLabels!"
+                            [plotOptions]="typeChartOptions.plotOptions!"
+                            [xaxis]="typeChartOptions.xaxis!"
+                            [yaxis]="typeChartOptions.yaxis!"
+                            [colors]="typeChartOptions.colors!"
+                            [stroke]="typeChartOptions.stroke!"
+                        ></apx-chart>
                     </div>
                 </div>
             </div>
 
-            <!-- Legal Form Chart -->
-            <div class="col-lg-4">
+            <!-- Graphique de forme juridique -->
+            <div class="col-lg-4 col-md-12 mb-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-white">
-                        <h5 class="mb-0">Formes Juridiques</h5>
+                        <h5 class="card-title mb-0">Formes juridiques</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="legal-form-grid">
-                            <ng-container *ngFor="let forme of getObjectKeys(dashboardData.projets_par_forme_juridique)">
-                                <div class="legal-form-item" [style.background-color]="formeJuridiqueColors[forme] || '#4285F4'">
-                                    <h3 class="legal-form-value">{{ dashboardData.projets_par_forme_juridique[forme] }}</h3>
-                                    <div class="legal-form-name">{{ forme }}</div>
-                                    <div class="legal-form-percentage">
-                                        {{ getPercentage(dashboardData.projets_par_forme_juridique[forme], dashboardData.total_projets) }}%
-                                    </div>
-                                </div>
-                            </ng-container>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <div *ngIf="isLoading" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
                         </div>
+                        <div *ngIf="error" class="text-center py-5 text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <p>Erreur lors du chargement des données</p>
+                        </div>
+                        <apx-chart 
+                            *ngIf="!isLoading && !error"
+                            #formeJuridiqueChart
+                            [series]="formeJuridiqueChartOptions.series!"
+                            [chart]="formeJuridiqueChartOptions.chart!"
+                            [labels]="formeJuridiqueChartOptions.labels!"
+                            [colors]="formeJuridiqueChartOptions.colors!"
+                            [responsive]="formeJuridiqueChartOptions.responsive!"
+                            [dataLabels]="formeJuridiqueChartOptions.dataLabels!"
+                            [legend]="formeJuridiqueChartOptions.legend!"
+                        ></apx-chart>
                     </div>
                 </div>
             </div>
@@ -201,7 +186,6 @@
                                 <th>Forme Juridique</th>
                                 <th>Statut</th>
                                 <th>Date</th>
-                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -232,11 +216,6 @@
                                     }">{{ project.statut }}</span>
                                 </td>
                                 <td>{{ formatDate(project.created_at) }}</td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-primary" (click)="goToProjectDetails(project.id)">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
