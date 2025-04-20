@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth/auth.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -12,6 +13,10 @@ import { CommonModule } from '@angular/common';
 })
 export default class LandingPageComponent implements OnInit {
   inscriptionForm!: FormGroup;
+  error = '';
+  isLoading = false;
+  submitted = false;
+
   formesJuridiques: string[] = [
     'SARL', 
     'SA', 
@@ -23,7 +28,7 @@ export default class LandingPageComponent implements OnInit {
     'Autre'
   ];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
     this.initForm();
@@ -43,22 +48,20 @@ export default class LandingPageComponent implements OnInit {
   initForm() {
     this.inscriptionForm = this.fb.group({
       nom: ['', Validators.required],
-      prenom: ['', Validators.required],
-      dateNaissance: ['', Validators.required],
-      lieuNaissance: ['', Validators.required],
-      typeProjet: ['', Validators.required],
-      formeJuridique: ['', Validators.required],
-      numeroCNI: ['', Validators.required],
-      fileCNI: ['', Validators.required],
-      pieceIdentite: ['', Validators.required],
-      planAffaires: ['', Validators.required]
+      prenoms: ['', Validators.required],
+      date_naissance: ['', Validators.required],
+      lieu_naissance: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      type_projet: ['', Validators.required],
+      forme_juridique: ['', Validators.required],
+      num_cni: ['', Validators.required],
+      cni: ['', Validators.required],
+      piece_identite: ['', Validators.required],
+      plan_affaire: ['', Validators.required]
     });
   }
 
-  isInvalid(controlName: string): boolean {
-    const control = this.inscriptionForm.get(controlName);
-    return !!control && control.invalid && (control.dirty || control.touched);
-  }
+  get f() { return this.inscriptionForm.controls; }
 
   onFileChange(event: any, controlName: string) {
     const file = event.target.files[0];
@@ -102,33 +105,31 @@ export default class LandingPageComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.inscriptionForm.valid) {
-      const formData = new FormData();
-      
-      // Ajouter les champs textuels
-      Object.keys(this.inscriptionForm.controls).forEach(key => {
-        const control = this.inscriptionForm.get(key);
-        if (control?.value instanceof File) {
-          formData.append(key, control.value, control.value.name);
-        } else if (control?.value) {
-          formData.append(key, control.value);
-        }
-      });
-      
-      // Ici, vous pourriez appeler un service pour envoyer les données
-      console.log('Formulaire soumis:', formData);
-      
-      // Logique pour traiter la soumission (par exemple, appel API)
-      // this.projetService.soumettre(formData).subscribe(response => {
-      //   console.log('Réponse du serveur:', response);
-      //   // Redirection ou message de succès
-      // });
-    } else {
-      // Marquer tous les champs comme touchés pour afficher les erreurs
-      Object.keys(this.inscriptionForm.controls).forEach(key => {
-        const control = this.inscriptionForm.get(key);
-        control?.markAsTouched();
-      });
+    this.submitted = true;
+    const formData = new FormData();
+
+    if (this.inscriptionForm.invalid) {
+      return;
     }
+
+    // Ajouter les champs textuels
+    Object.keys(this.inscriptionForm.controls).forEach(key => {
+      const control = this.inscriptionForm.get(key);
+      if (control?.value instanceof File) {
+        formData.append(key, control.value, control.value.name);
+      } else if (control?.value) {
+        formData.append(key, control.value);
+      }
+    });
+
+    this.isLoading = true;
+    this.authService.register(formData).subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (error: any) => {
+        this.error = error.error.message;
+      }
+    });
   }
 }

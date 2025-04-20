@@ -64,9 +64,14 @@
             <h4 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Formulaire d'Inscription</h4>
           </div>
           
-          <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()">
+          <form novalidate [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+            @if (error) {
+              <div class="col-12">
+                <div class="alert alert-danger">{{ error }}</div>
+              </div>
+            }
             <!-- Informations personnelles -->
-            <div class="row mb-4">
+            <div class="row">
               <div class="col-12 mb-3">
                 <h5 class="form-section-title"><i class="fas fa-user me-2"></i> Informations personnelles</h5>
               </div>
@@ -79,11 +84,15 @@
                   id="nom" 
                   placeholder="Entrez votre nom"
                   formControlName="nom"
-                  [ngClass]="{'is-invalid': isInvalid('nom')}"
+                  [ngClass]="{'is-invalid': submitted && f['nom'].errors}"
                 >
-                <div *ngIf="isInvalid('nom')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('nom')?.errors?.['required']">Le nom est requis</div>
-                </div>
+                @if (submitted && f['nom'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['nom'].errors['required']) {
+                      <span>Le nom est requis</span>
+                    }
+                  </div>
+                }
               </div>
               
               <div class="col-md-6 form-group">
@@ -93,48 +102,78 @@
                   class="form-control" 
                   id="prenom" 
                   placeholder="Entrez votre prénom"
-                  formControlName="prenom"
-                  [ngClass]="{'is-invalid': isInvalid('prenom')}"
+                  formControlName="prenoms"
+                  [ngClass]="{'is-invalid': submitted && f['prenoms'].errors}"
                 >
-                <div *ngIf="isInvalid('prenom')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('prenom')?.errors?.['required']">Le prénom est requis</div>
-                </div>
+                @if (submitted && f['prenoms'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['prenoms'].errors['required']) {
+                      <span>Le prénom(s) est requis</span>
+                    }
+                  </div>
+                }
               </div>
             </div>
 
             <div class="row mb-4">
-              <div class="col-md-6 form-group">
+              <div class="col-md-4 form-group">
                 <label for="dateNaissance" class="form-label">Date de Naissance <span class="text-danger">*</span></label>
                 <input 
                   type="date" 
                   class="form-control" 
                   id="dateNaissance" 
-                  formControlName="dateNaissance"
-                  [ngClass]="{'is-invalid': isInvalid('dateNaissance')}"
+                  formControlName="date_naissance"
+                  [ngClass]="{'is-invalid': submitted && f['date_naissance'].errors}"
                 >
-                <div *ngIf="isInvalid('dateNaissance')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('dateNaissance')?.errors?.['required']">La date de naissance est requise</div>
-                </div>
+                @if (submitted && f['date_naissance'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['date_naissance'].errors['required']) {
+                      <span>La date de naissance est requise</span>
+                    }
+                  </div>
+                }
               </div>
               
-              <div class="col-md-6 form-group">
+              <div class="col-md-4 form-group">
                 <label for="lieuNaissance" class="form-label">Lieu de Naissance <span class="text-danger">*</span></label>
                 <input 
                   type="text" 
                   class="form-control" 
                   id="lieuNaissance" 
                   placeholder="Entrez votre lieu de naissance"
-                  formControlName="lieuNaissance"
-                  [ngClass]="{'is-invalid': isInvalid('lieuNaissance')}"
+                  formControlName="lieu_naissance"
+                  [ngClass]="{'is-invalid': submitted && f['lieu_naissance'].errors}"
                 >
-                <div *ngIf="isInvalid('lieuNaissance')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('lieuNaissance')?.errors?.['required']">Le lieu de naissance est requis</div>
-                </div>
+                @if (submitted && f['lieu_naissance'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['lieu_naissance'].errors['required']) {
+                      <span>Le lieu de naissance est requis</span>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="col-md-4 form-group">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  id="email" 
+                  placeholder="Entrez votre email"
+                  formControlName="email"
+                  [ngClass]="{'is-invalid': submitted && f['email'].errors}"
+                >
+                @if (submitted && f['email'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['email'].errors['required']) {
+                      <span>L'email est requis</span>
+                    }
+                  </div>
+                }
               </div>
             </div>
 
             <!-- Informations du projet -->
-            <div class="row mb-4">
+            <div class="row">
               <div class="col-12 mb-3">
                 <h5 class="form-section-title"><i class="fas fa-project-diagram me-2"></i> Informations du projet</h5>
               </div>
@@ -144,32 +183,40 @@
                 <select 
                   class="form-select" 
                   id="typeProjet" 
-                  formControlName="typeProjet"
-                  [ngClass]="{'is-invalid': isInvalid('typeProjet')}"
+                  formControlName="type_projet"
+                  [ngClass]="{'is-invalid': submitted && f['type_projet'].errors}"
                 >
                   <option value="" disabled selected>Sélectionnez le type de projet</option>
                   <option value="En Développement">En Développement</option>
                   <option value="En Création">En Création</option>
                 </select>
-                <div *ngIf="isInvalid('typeProjet')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('typeProjet')?.errors?.['required']">Le type de projet est requis</div>
-                </div>
+                @if (submitted && f['type_projet'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['type_projet'].errors['required']) {
+                      <span>Le type de projet est requis</span>
+                    }
+                  </div>
+                }
               </div>
               
               <div class="col-md-6 form-group">
-                <label for="formeJuridique" class="form-label">Forme Juridique <span class="text-danger">*</span></label>
+                <label for="forme_juridique" class="form-label">Forme Juridique <span class="text-danger">*</span></label>
                 <select 
                   class="form-select" 
-                  id="formeJuridique" 
-                  formControlName="formeJuridique"
-                  [ngClass]="{'is-invalid': isInvalid('formeJuridique')}"
+                  id="forme_juridique" 
+                  formControlName="forme_juridique"
+                  [ngClass]="{'is-invalid': submitted && f['forme_juridique'].errors}"
                 >
                   <option value="" disabled selected>Sélectionnez la forme juridique</option>
                   <option *ngFor="let forme of formesJuridiques" [value]="forme">{{ forme }}</option>
                 </select>
-                <div *ngIf="isInvalid('formeJuridique')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('formeJuridique')?.errors?.['required']">La forme juridique est requise</div>
-                </div>
+                @if (submitted && f['forme_juridique'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['forme_juridique'].errors['required']) {
+                      <span>La forme juridique est requise</span>
+                    }
+                  </div>
+                }
               </div>
             </div>
 
@@ -181,12 +228,16 @@
                   class="form-control" 
                   id="numeroCNI" 
                   placeholder="Entrez votre numéro CNI"
-                  formControlName="numeroCNI"
-                  [ngClass]="{'is-invalid': isInvalid('numeroCNI')}"
+                  formControlName="num_cni"
+                  [ngClass]="{'is-invalid': submitted && f['num_cni'].errors}"
                 >
-                <div *ngIf="isInvalid('numeroCNI')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('numeroCNI')?.errors?.['required']">Le numéro CNI est requis</div>
-                </div>
+                @if (submitted && f['num_cni'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['num_cni'].errors['required']) {
+                      <span>Le numéro CNI est requis</span>
+                    }
+                  </div>
+                }
               </div>
             </div>
 
@@ -198,61 +249,75 @@
               </div>
               
               <div class="col-md-4 form-group">
-                <label for="fileCNI" class="form-label">Joindre CNI <span class="text-danger">*</span></label>
+                <label for="cni" class="form-label">Joindre CNI <span class="text-danger">*</span></label>
                 <input 
                   type="file" 
                   class="form-control" 
-                  id="fileCNI" 
-                  (change)="onFileChange($event, 'fileCNI')"
-                  [ngClass]="{'is-invalid': isInvalid('fileCNI')}"
+                  id="cni" 
+                  (change)="onFileChange($event, 'cni')"
+                  [ngClass]="{'is-invalid': submitted && f['cni'].errors}"
                 >
-                <div *ngIf="isInvalid('fileCNI')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('fileCNI')?.errors?.['required']">Le fichier CNI est requis</div>
-                  <div *ngIf="inscriptionForm.get('fileCNI')?.errors?.['invalidFileType']">Format de fichier non valide</div>
-                  <div *ngIf="inscriptionForm.get('fileCNI')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
-                </div>
+                @if (submitted && f['cni'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['cni'].errors['required']) {
+                      <span>Le fichier CNI est requis</span>
+                    }
+                  </div>
+                }
+                  <div *ngIf="inscriptionForm.get('cni')?.errors?.['invalidFileType']">Format de fichier non valide</div>
+                  <div *ngIf="inscriptionForm.get('cni')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
                 <small class="form-text text-muted">Formats acceptés: PDF, JPG, PNG (Max: 5 MB)</small>
               </div>
 
               <div class="col-md-4 form-group">
-                <label for="pieceIdentite" class="form-label">Joindre Pièce d'Identité <span class="text-danger">*</span></label>
+                <label for="piece_identite" class="form-label">Joindre Pièce d'Identité <span class="text-danger">*</span></label>
                 <input 
                   type="file" 
                   class="form-control" 
-                  id="pieceIdentite" 
-                  (change)="onFileChange($event, 'pieceIdentite')"
-                  [ngClass]="{'is-invalid': isInvalid('pieceIdentite')}"
+                  id="piece_identite" 
+                  (change)="onFileChange($event, 'piece_identite')"
+                  [ngClass]="{'is-invalid': submitted && f['piece_identite'].errors}"
                 >
-                <div *ngIf="isInvalid('pieceIdentite')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('pieceIdentite')?.errors?.['required']">La pièce d'identité est requise</div>
-                  <div *ngIf="inscriptionForm.get('pieceIdentite')?.errors?.['invalidFileType']">Format de fichier non valide</div>
-                  <div *ngIf="inscriptionForm.get('pieceIdentite')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
-                </div>
-                <small class="form-text text-muted">Formats acceptés: PDF, JPG, PNG (Max: 5 MB)</small>
+                @if (submitted && f['piece_identite'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['piece_identite'].errors['required']) {
+                      <span>La pièce d'identité est requise</span>
+                    }
+                  </div>
+                }
+                  <div *ngIf="inscriptionForm.get('piece_identite')?.errors?.['invalidFileType']">Format de fichier non valide</div>
+                  <div *ngIf="inscriptionForm.get('piece_identite')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
+                  <small class="form-text text-muted">Formats acceptés: PDF, JPG, PNG (Max: 5 MB)</small>
               </div>
 
               <div class="col-md-4 form-group">
-                <label for="planAffaires" class="form-label">Joindre Plan d'Affaires <span class="text-danger">*</span></label>
+                <label for="plan_affaire" class="form-label">Joindre Plan d'Affaires <span class="text-danger">*</span></label>
                 <input 
                   type="file" 
                   class="form-control" 
-                  id="planAffaires" 
-                  (change)="onFileChange($event, 'planAffaires')"
-                  [ngClass]="{'is-invalid': isInvalid('planAffaires')}"
+                  id="plan_affaire" 
+                  (change)="onFileChange($event, 'plan_affaire')"
+                  [ngClass]="{'is-invalid': submitted && f['plan_affaire'].errors}"
                 >
-                <div *ngIf="isInvalid('planAffaires')" class="invalid-feedback">
-                  <div *ngIf="inscriptionForm.get('planAffaires')?.errors?.['required']">Le plan d'affaires est requis</div>
-                  <div *ngIf="inscriptionForm.get('planAffaires')?.errors?.['invalidFileType']">Format de fichier non valide</div>
-                  <div *ngIf="inscriptionForm.get('planAffaires')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
-                </div>
+                @if (submitted && f['plan_affaire'].errors) {
+                  <div class="invalid-feedback">
+                    @if (f['plan_affaire'].errors['required']) {
+                      <span>Le plan d'affaires est requis</span>
+                    }
+                  </div>
+                }
+                <div *ngIf="inscriptionForm.get('plan_affaire')?.errors?.['invalidFileType']">Format de fichier non valide</div>
+                <div *ngIf="inscriptionForm.get('plan_affaire')?.errors?.['invalidFileSize']">Taille du fichier trop grande</div>
                 <small class="form-text text-muted">Formats acceptés: PDF (Max: 10 MB)</small>
               </div>
             </div>
 
             <div class="submit-section">
               <p class="text-muted mb-4">En soumettant ce formulaire, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.</p>
-              <button type="submit" class="btn btn-primary btn-lg" [disabled]="inscriptionForm.invalid">
-                <i class="fas fa-paper-plane me-2"></i> Soumettre mon projet
+              <button type="submit" class="btn btn-primary btn-lg">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span *ngIf="!isLoading"><i class="fas fa-paper-plane me-2"></i></span>
+                Soumettre mon projet
               </button>
             </div>
           </form>
@@ -297,5 +362,5 @@
         <p class="text-light mb-0">&copy; 2025 GestPro. Tous droits réservés.</p>
         </div>
     </div>
-</div>
+  </div>
 </footer>

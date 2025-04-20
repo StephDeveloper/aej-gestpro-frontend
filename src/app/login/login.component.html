@@ -25,7 +25,12 @@
           <p class="text-muted">Veuillez vous connecter pour accéder à votre espace</p>
         </div>
         
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <form novalidate [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          @if (error) {
+            <div class="col-12">
+              <div class="alert alert-danger">{{ error }}</div>
+            </div>
+          }
           <div class="form-group mb-4">
             <label for="email" class="form-label">Adresse Email</label>
             <div class="input-group">
@@ -36,13 +41,19 @@
                 id="email" 
                 placeholder="Votre adresse email" 
                 formControlName="email"
-                [ngClass]="{'is-invalid': isInvalid('email')}"
+                [ngClass]="{'is-invalid': submitted && f['email'].errors}"
               >
             </div>
-            <div *ngIf="isInvalid('email')" class="invalid-feedback d-block">
-              <div *ngIf="loginForm.get('email')?.errors?.['required']">L'email est requis</div>
-              <div *ngIf="loginForm.get('email')?.errors?.['email']">Format d'email invalide</div>
-            </div>
+            @if(submitted && f['email'].errors) {
+              <div class="invalid-feedback d-block">
+                @if(f['email'].errors['required']) {
+                  <span>L'email est requis</span>
+                }
+                @if(f['email'].errors['email']) {
+                  <span>Format d'email invalide</span>
+                }
+              </div>
+            }
           </div>
           
           <div class="form-group mb-4">
@@ -58,7 +69,7 @@
                 id="password" 
                 placeholder="Votre mot de passe" 
                 formControlName="password"
-                [ngClass]="{'is-invalid': isInvalid('password')}"
+                [ngClass]="{'is-invalid': submitted && f['password'].errors}"
               >
               <button 
                 class="input-group-text password-toggle" 
@@ -68,29 +79,22 @@
                 <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
               </button>
             </div>
-            <div *ngIf="isInvalid('password')" class="invalid-feedback d-block">
-              <div *ngIf="loginForm.get('password')?.errors?.['required']">Le mot de passe est requis</div>
-              <div *ngIf="loginForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères</div>
-            </div>
-          </div>
-          
-          <div class="form-group mb-4">
-            <div class="form-check">
-              <input 
-                type="checkbox" 
-                class="form-check-input" 
-                id="rememberMe" 
-                formControlName="rememberMe"
-              >
-              <label class="form-check-label" for="rememberMe">Se souvenir de moi</label>
-            </div>
+            @if(submitted && f['password'].errors) {
+              <div class="invalid-feedback d-block">
+                @if(f['password'].errors['required']) {
+                  <span>Le mot de passe est requis</span>
+                }
+                @if(f['password'].errors['minlength']) {
+                  <span>Le mot de passe doit contenir au moins 6 caractères</span>
+                }
+              </div>
+            }
           </div>
           
           <div class="form-group">
             <button 
               type="submit" 
-              class="btn btn-primary btn-lg w-100" 
-              [disabled]="loginForm.invalid || isLoading"
+              class="btn btn-primary btn-lg w-100"
             >
               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
               <span *ngIf="!isLoading"><i class="fas fa-sign-in-alt me-2"></i></span>
@@ -100,7 +104,7 @@
         </form>
         
         <div class="text-center mt-4">
-          <p class="mb-0">Vous n'avez pas de compte ? <a href="#" class="register-link">Inscrivez-vous</a></p>
+          <p class="mb-0">Vous n'avez pas de compte ? <a routerLink="/register" class="register-link">Inscrivez-vous</a></p>
         </div>
         
         <div class="login-footer text-center mt-5">
