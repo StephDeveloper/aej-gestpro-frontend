@@ -19,6 +19,7 @@ export default class LandingPageComponent implements OnInit {
   isLoading = false;
   submitted = false;
   successMessage = false;
+  dateNow = new Date();
 
   formesJuridiques: string[] = [
     'SCS',

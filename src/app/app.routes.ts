@@ -9,5 +9,6 @@ export const routes: Routes = [
     { path: 'home', loadComponent: () => import('./layout/home/home.component'), canActivate: [authGuard], children: [
         { path: 'dashboard', title: 'GestPro - Tableau de bord', loadComponent: () => import('./pages/dashboard/dashboard.component') },
         { path: 'projects', title: 'GestPro - Liste des Projets', loadComponent: () => import('./pages/projects/projects.component') },
+        { path: 'projects-recap', title: 'GestPro - Récapitulatif des Projets', loadComponent: () => import('./pages/projects-summary/projects-summary.component') },
     ] },
 ];
