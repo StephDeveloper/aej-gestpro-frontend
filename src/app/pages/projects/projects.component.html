@@ -77,9 +77,9 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="cursor-pointer" (click)="sortProjects('nom')">Promoteur</th>
-                            <th class="cursor-pointer" (click)="sortProjects('type_projet')">Type</th>
-                            <th class="cursor-pointer" (click)="sortProjects('forme_juridique')">Forme</th>
+                            <th class="cursor-pointer" (click)="sortProjects('type_projet')">Projet</th>
                             <th class="cursor-pointer" (click)="sortProjects('statut')">Statut</th>
+                            <th class="cursor-pointer" (click)="sortProjects('date_creation')">Date de soumission</th>
                             <th>Documents</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -98,10 +98,10 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-circle bg-primary text-white me-2">
-                                        {{ project.nom.charAt(0) }}{{ project.prenoms.charAt(0) }}
+                                        {{ project.nom.charAt(0) | titlecase }}{{ project.prenoms.charAt(0) | titlecase }}
                                     </div>
                                     <div>
-                                        <div class="fw-medium">{{ getPromoteurFullName(project) }}</div>
+                                        <div class="fw-medium">{{ getPromoteurFullName(project) | titlecase }}</div>
                                         <small class="text-muted">{{ project.email }}</small>
                                     </div>
                                 </div>
@@ -111,9 +111,9 @@
                                     'bg-success': project.type_projet === 'En Création',
                                     'bg-info': project.type_projet === 'En Développement',
                                     'bg-warning': project.type_projet !== 'En Création' && project.type_projet !== 'En Développement'
-                                }">{{ project.type_projet }}</span>
+                                }">{{ project.type_projet }}</span><br>
+                                <small>{{ project.forme_juridique }}</small>
                             </td>
-                            <td><small>{{ project.forme_juridique }}</small></td>
                             <td>
                                 <span class="badge" [ngClass]="{
                                     'bg-warning': project.statut === 'en cours',
@@ -121,6 +121,7 @@
                                     'bg-danger': project.statut === 'Rejeté'
                                 }">{{ project.statut }}</span>
                             </td>
+                            <td class="text-center">{{ project.created_at | date:'dd/MM/yyyy' }}</td>
                             <!-- Colonne des documents -->
                             <td>
                                 <div class="document-icons">
@@ -145,20 +146,20 @@
                             <td class="text-center">
                                 <div class="action-buttons">
                                     <!-- Bouton Valider -->
-                                    <button class="btn btn-sm btn-success action-btn" 
+                                    <button class="btn btn-success action-btn" 
                                             title="Valider ce projet"
                                             *ngIf="project.statut !== 'validé'"
                                             (click)="validateProject(project)"
-                                            [disabled]="isProcessing">
+                                            [disabled]="project.statut === 'Validé' || project.statut === 'Rejeté'">
                                         <i class="fas fa-check me-1"></i>Valider
                                     </button>
                                     
                                     <!-- Bouton Rejeter -->
-                                    <button class="btn btn-sm btn-danger action-btn"
+                                    <button class="btn btn-danger action-btn"
                                             title="Rejeter ce projet"
                                             *ngIf="project.statut !== 'rejeté'"
                                             (click)="rejectProject(project)"
-                                            [disabled]="isProcessing">
+                                            [disabled]="project.statut === 'Validé' || project.statut === 'Rejeté'">
                                         <i class="fas fa-times me-1"></i>Rejeter
                                     </button>
                                     
