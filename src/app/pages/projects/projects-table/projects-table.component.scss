@@ -1,0 +1,314 @@
+// Styles pour le tableau
+.table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}
+
+// Avatar pour les promoteurs
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+// Style pour l'état vide
+.empty-state {
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Animations pour les transitions
+.card {
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+// Badges responsive
+.badge {
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+// Styles pour les boutons de validation et de rejet
+.action-btn {
+  padding: 0.375rem 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  margin: 0 5px;
+  min-width: 80px;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Styles pour les icônes de documents
+.document-icons {
+  display: flex;
+  gap: 8px;
+  
+  .doc-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: #f8f9fa;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: currentColor;
+      opacity: 0.1;
+      z-index: 0;
+    }
+    
+    i {
+      position: relative;
+      z-index: 1;
+    }
+    
+    &:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      
+      &::before {
+        opacity: 0.2;
+      }
+    }
+    
+    &:active {
+      transform: translateY(-1px) scale(0.95);
+    }
+    
+    // Styles spécifiques pour chaque type de document
+    &:nth-child(1) {
+      color: #fd7e14; // Orange pour CNI
+    }
+    
+    &:nth-child(2) {
+      color: #20c997; // Vert pour pièce d'identité
+    }
+    
+    &:nth-child(3) {
+      color: #6f42c1; // Violet pour plan d'affaires
+    }
+  }
+}
+
+// Styles pour le tableau compact
+.compact-table {
+  font-size: 0.875rem;
+  
+  th {
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+  }
+  
+  td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+  }
+  
+  .avatar-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+// Styles pour les boutons d'action
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  
+  // Style des badges d'état
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    
+    &.validated {
+      background-color: rgba(40, 167, 69, 0.15);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    
+    &.rejected {
+      background-color: rgba(220, 53, 69, 0.15);
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+  }
+}
+
+// Styles pour la pagination
+.pagination-container {
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  border-radius: 0 0 0.25rem 0.25rem;
+  font-size: 0.875rem;
+  
+  .pagination {
+    margin-bottom: 0;
+    
+    .page-item {
+      .page-link {
+        color: #495057;
+        padding: 0.375rem 0.75rem;
+        border-color: #dee2e6;
+        background-color: #fff;
+        font-size: 0.875rem;
+        
+        &:hover {
+          background-color: #e9ecef;
+          color: #0d6efd;
+        }
+      }
+      
+      &.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+      }
+      
+      &.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+      }
+    }
+  }
+  
+  .form-select {
+    padding: 0.25rem 2rem 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .pagination-info {
+    white-space: nowrap;
+  }
+}
+
+// Ajustements responsifs
+@media (max-width: 768px) {
+  .row.g-3 > div {
+    margin-bottom: 0.5rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+  
+  .avatar-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+  
+  .document-icons {
+    gap: 6px;
+    
+    .doc-icon {
+      width: 26px;
+      height: 26px;
+      
+      i {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+  .action-btn {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    min-width: 70px;
+  }
+  
+  .action-buttons {
+    .status-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+    }
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    .pagination-info {
+      order: -1;
+    }
+    
+    .page-size-selector {
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .pagination {
+      .page-link {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}

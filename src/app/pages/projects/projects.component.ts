@@ -4,29 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../services/project/project.service';
 import { environnement } from '../../environnement/environnement';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FilePreviewModalComponent } from './file-preview-modal/file-preview-modal.component';
+import { AiAnalysisModalComponent } from './ai-analysis-modal/ai-analysis-modal.component';
+import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
+import { ProjectsTableComponent, Project } from './projects-table/projects-table.component';
+import { FiltersSearchComponent } from './filters-search/filters-search.component';
 
 declare var $: any;
-
-export interface Project {
-  id: number;
-  nom: string;
-  prenoms: string;
-  date_naissance: string;
-  lieu_naissance: string;
-  email: string;
-  type_projet: string;
-  forme_juridique: string;
-  num_cni: string;
-  cni: string;
-  piece_identite: string;
-  plan_affaire: string;
-  statut: string;
-  created_at: string;
-  updated_at: string;
-  cni_url?: string;
-  piece_identite_url?: string;
-  plan_affaire_url?: string;
-}
 
 export interface ProjectAI {
   projet: {
@@ -48,7 +32,15 @@ export interface ProjectAI {
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    FilePreviewModalComponent, 
+    AiAnalysisModalComponent, 
+    ConfirmationModalComponent,
+    ProjectsTableComponent,
+    FiltersSearchComponent
+  ],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss'
 })
@@ -284,7 +276,7 @@ export default class ProjectsComponent implements OnInit {
         break;
     }
     
-    console.log('Ouverture du fichier:', fileUrl);
+    // console.log('Ouverture du fichier:', fileUrl);
     
     // Vérifier que l'URL est valide
     if (!fileUrl) {
@@ -357,7 +349,7 @@ export default class ProjectsComponent implements OnInit {
   validateProject(project: Project): void {
     if (this.isProcessing) return;
     
-    console.log('Validation du projet:', project);
+    // console.log('Validation du projet:', project);
     
     // Afficher le modal de confirmation
     this.showConfirmModal = true;
@@ -387,9 +379,9 @@ export default class ProjectsComponent implements OnInit {
   }
   
   // Confirmer la mise à jour du statut avec justification
-  confirmStatusUpdate(): void {
+  confirmStatusUpdate(justification: string): void {
     // Vérifier que la justification est fournie
-    if (!this.justification || this.justification.trim() === '') {
+    if (!justification || justification.trim() === '') {
       this.justificationError = true;
       return;
     }
@@ -401,7 +393,7 @@ export default class ProjectsComponent implements OnInit {
     this.projectService.updateProjectStatus(
       this.selectedProject.id, 
       this.confirmAction, 
-      this.justification.trim()
+      justification.trim()
     ).subscribe({
       next: (response: any) => {
         if (response.success) {
@@ -456,7 +448,7 @@ export default class ProjectsComponent implements OnInit {
       next: (response: any) => {
         if (response.success) {
           this.projectsAI = response.data;
-          console.log('Analyse IA:', this.projectsAI);
+          // console.log('Analyse IA:', this.projectsAI);
         } else {
           console.error('Erreur de réponse:', response.message);
         }
@@ -471,15 +463,11 @@ export default class ProjectsComponent implements OnInit {
     });
   }
   
-  closeAIModal() {
-    // Empêcher la fermeture du modal si l'analyse est en cours
-    // if (this.isAIAnalysisLoading) {
-    //   return;
-    // }
+  closeAIModal(): void {
     this.showAIModal = false;
   }
   
-  validateProjectFromAI(projectId: number) {
+  validateProjectFromAI(projectId: number): void {
     if (this.isProcessing) return;
     
     const project = this.projects.find(p => p.id === projectId);
@@ -491,7 +479,7 @@ export default class ProjectsComponent implements OnInit {
     }
   }
   
-  rejectProjectFromAI(projectId: number) {
+  rejectProjectFromAI(projectId: number): void {
     if (this.isProcessing) return;
     
     const project = this.projects.find(p => p.id === projectId);

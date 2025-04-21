@@ -11,16 +11,16 @@
       <div class="collapse navbar-collapse" id="navbarMain">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Accueil</a>
+            <a class="nav-link active" aria-current="page" routerLink="/">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Services</a>
+            <a class="nav-link" routerLink="#">Services</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">À propos</a>
+            <a class="nav-link" routerLink="#">À propos</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
+            <a class="nav-link" routerLink="#">Contact</a>
           </li>
           <li class="nav-item ms-lg-3">
             <a class="btn btn-outline-light" routerLink="/login">Connexion</a>
@@ -40,7 +40,7 @@
         <p class="hero-subtitle">Une plateforme complète pour gérer efficacement vos projets de développement, du concept à la réalisation.</p>
         <div class="hero-cta mt-4">
           <a href="#inscription" class="btn btn-primary btn-lg me-3" (click)="scrollToInscription($event)">Soumettre votre projet</a>
-          <a href="#" class="btn btn-outline-light btn-lg">En savoir plus</a>
+          <a routerLink="#" class="btn btn-outline-light btn-lg">En savoir plus</a>
         </div>
       </div>
     </div>

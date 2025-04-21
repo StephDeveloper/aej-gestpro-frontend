@@ -1,0 +1,49 @@
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <!-- Recherche par nom/prénom -->
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Rechercher par promoteur..." 
+                        [ngModel]="searchTerm"
+                        (input)="onSearchTermChange($any($event.target).value)">
+                </div>
+            </div>
+            
+            <!-- Filtre par type de projet -->
+            <div class="col-md-3">
+                <select 
+                    class="form-select form-control" 
+                    [ngModel]="selectedType" 
+                    (change)="onSelectedTypeChange($any($event.target).value)">
+                    <option value="">Tous les types de projets</option>
+                    <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
+                </select>
+            </div>
+            
+            <!-- Filtre par statut -->
+            <div class="col-md-3">
+                <select 
+                    class="form-select form-control" 
+                    [ngModel]="selectedStatus" 
+                    (change)="onSelectedStatusChange($any($event.target).value)">
+                    <option value="">Tous les statuts</option>
+                    <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+                </select>
+            </div>
+            
+            <!-- Bouton de réinitialisation -->
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+                    <i class="fas fa-redo-alt me-1"></i> Réinitialiser
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

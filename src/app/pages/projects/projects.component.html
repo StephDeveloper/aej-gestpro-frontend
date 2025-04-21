@@ -13,56 +13,18 @@
     </div>
 
     <!-- Filtres et recherche -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <!-- Recherche par nom/prénom -->
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            placeholder="Rechercher par promoteur..." 
-                            [(ngModel)]="searchTerm"
-                            (input)="applyFilters()">
-                    </div>
-                </div>
-                
-                <!-- Filtre par type de projet -->
-                <div class="col-md-3">
-                    <select class="form-select form-control" [(ngModel)]="selectedType" (change)="applyFilters()">
-                        <option value="">Tous les types de projets</option>
-                        <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
-                    </select>
-                </div>
-                
-                <!-- Filtre par statut -->
-                <div class="col-md-3">
-                    <select class="form-select form-control" [(ngModel)]="selectedStatus" (change)="applyFilters()">
-                        <option value="">Tous les statuts</option>
-                        <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
-                    </select>
-                </div>
-                
-                <!-- Bouton de réinitialisation -->
-                <div class="col-md-2">
-                    <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
-                        <i class="fas fa-redo-alt me-1"></i> Réinitialiser
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Message de chargement -->
-    <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Chargement...</span>
-        </div>
-    </div>
+    <app-filters-search
+        [searchTerm]="searchTerm"
+        [selectedType]="selectedType"
+        [selectedStatus]="selectedStatus"
+        [typeOptions]="typeOptions"
+        [statusOptions]="statusOptions"
+        (searchTermChange)="searchTerm = $event"
+        (selectedTypeChange)="selectedType = $event"
+        (selectedStatusChange)="selectedStatus = $event"
+        (applyFiltersEvent)="applyFilters()"
+        (resetFiltersEvent)="resetFilters()">
+    </app-filters-search>
 
     <!-- Message d'erreur -->
     <div *ngIf="error" class="alert alert-danger">
@@ -70,384 +32,53 @@
     </div>
 
     <!-- Tableau des projets -->
-    <div *ngIf="!isLoading && !error" class="card shadow">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 compact-table">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="cursor-pointer" (click)="sortProjects('nom')">Promoteur</th>
-                            <th class="cursor-pointer" (click)="sortProjects('type_projet')">Projet</th>
-                            <th class="cursor-pointer" (click)="sortProjects('statut')">Statut</th>
-                            <th class="cursor-pointer" (click)="sortProjects('date_creation')">Date de soumission</th>
-                            <th>Documents</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngIf="paginatedProjects.length === 0">
-                            <td colspan="6" class="text-center py-4">
-                                <div class="empty-state">
-                                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                                    <h5>Aucun projet trouvé</h5>
-                                    <p class="text-muted">Essayez de modifier vos critères de recherche</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr *ngFor="let project of paginatedProjects">
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-primary text-white me-2">
-                                        {{ project.nom.charAt(0) | titlecase }}{{ project.prenoms.charAt(0) | titlecase }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">{{ getPromoteurFullName(project) | titlecase }}</div>
-                                        <small class="text-muted">{{ project.email }}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge" [ngClass]="{
-                                    'bg-success': project.type_projet === 'En Création',
-                                    'bg-info': project.type_projet === 'En Développement',
-                                    'bg-warning': project.type_projet !== 'En Création' && project.type_projet !== 'En Développement'
-                                }">{{ project.type_projet }}</span><br>
-                                <small>{{ project.forme_juridique }}</small>
-                            </td>
-                            <td>
-                                <span class="badge" [ngClass]="{
-                                    'bg-warning': project.statut === 'en cours',
-                                    'bg-success': project.statut === 'Validé',
-                                    'bg-danger': project.statut === 'Rejeté'
-                                }">{{ project.statut }}</span>
-                            </td>
-                            <td class="text-center">{{ project.created_at | date:'dd/MM/yyyy' }}</td>
-                            <!-- Colonne des documents -->
-                            <td>
-                                <div class="document-icons">
-                                    <span class="doc-icon" title="Voir la CNI"
-                                          *ngIf="project.cni || project.cni_url" 
-                                          (click)="openFileModal(project, 'cni')">
-                                        <i class="fas fa-id-card"></i>
-                                    </span>
-                                    <span class="doc-icon" title="Voir la pièce d'identité"
-                                          *ngIf="project.piece_identite || project.piece_identite_url" 
-                                          (click)="openFileModal(project, 'piece_identite')">
-                                        <i class="fas fa-passport"></i>
-                                    </span>
-                                    <span class="doc-icon" title="Voir le plan d'affaires"
-                                          *ngIf="project.plan_affaire || project.plan_affaire_url" 
-                                          (click)="openFileModal(project, 'plan_affaire')">
-                                        <i class="fas fa-file-contract"></i>
-                                    </span>
-                                </div>
-                            </td>
-                            <!-- Colonne des actions -->
-                            <td class="text-center">
-                                <div class="action-buttons">
-                                    <!-- Bouton Valider -->
-                                    <button class="btn btn-success action-btn" 
-                                            title="Valider ce projet"
-                                            *ngIf="project.statut !== 'validé'"
-                                            (click)="validateProject(project)"
-                                            [disabled]="project.statut === 'Validé' || project.statut === 'Rejeté'">
-                                        <i class="fas fa-check me-1"></i>Valider
-                                    </button>
-                                    
-                                    <!-- Bouton Rejeter -->
-                                    <button class="btn btn-danger action-btn"
-                                            title="Rejeter ce projet"
-                                            *ngIf="project.statut !== 'rejeté'"
-                                            (click)="rejectProject(project)"
-                                            [disabled]="project.statut === 'Validé' || project.statut === 'Rejeté'">
-                                        <i class="fas fa-times me-1"></i>Rejeter
-                                    </button>
-                                    
-                                    <!-- Afficher un badge si le projet est déjà validé ou rejeté -->
-                                    <span *ngIf="project.statut === 'validé'" class="status-badge validated">
-                                        <i class="fas fa-check-circle me-1"></i>Validé
-                                    </span>
-                                    <span *ngIf="project.statut === 'rejeté'" class="status-badge rejected">
-                                        <i class="fas fa-times-circle me-1"></i>Rejeté
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            <div *ngIf="filteredProjects.length > 0" class="pagination-container mt-3 d-flex justify-content-between align-items-center">
-                <div class="page-size-selector">
-                    <span class="me-2">Afficher</span>
-                    <select class="form-select form-select-sm d-inline-block w-auto" 
-                            [(ngModel)]="pageSize" 
-                            (change)="changePageSize(pageSize)">
-                        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-                    </select>
-                    <span class="ms-2">éléments par page</span>
-                </div>
-                
-                <div class="pagination-info text-muted">
-                    Affichage de {{ paginatedProjects.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} 
-                    à {{ getEndIndex() }} 
-                    sur {{ filteredProjects.length }} projets
-                </div>
-                
-                <nav aria-label="Navigation des pages">
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item" [class.disabled]="currentPage === 1">
-                            <a class="page-link" href="javascript:void(0)" (click)="previousPage()">
-                                <i class="fas fa-chevron-left small"></i>
-                            </a>
-                        </li>
-                        
-                        <li class="page-item" *ngFor="let page of getPageNumbers()" 
-                            [class.active]="page === currentPage">
-                            <a class="page-link" href="javascript:void(0)" (click)="changePage(page)">
-                                {{ page }}
-                            </a>
-                        </li>
-                        
-                        <li class="page-item" [class.disabled]="currentPage === totalPages">
-                            <a class="page-link" href="javascript:void(0)" (click)="nextPage()">
-                                <i class="fas fa-chevron-right small"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </div>
+    <app-projects-table
+        [paginatedProjects]="paginatedProjects"
+        [isLoading]="isLoading"
+        [error]="error"
+        [filteredProjects]="filteredProjects"
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalPages]="totalPages"
+        [pageSizeOptions]="pageSizeOptions"
+        (validateProjectEvent)="validateProject($event)"
+        (rejectProjectEvent)="rejectProject($event)"
+        (openFileModalEvent)="openFileModal($event.project, $event.fileType)"
+        (sortProjectsEvent)="sortProjects($event)"
+        (pageChangeEvent)="changePage($event)"
+        (pageSizeChangeEvent)="changePageSize($event)"
+        (previousPageEvent)="previousPage()"
+        (nextPageEvent)="nextPage()">
+    </app-projects-table>
 </div>
 
 <!-- Modal pour afficher les fichiers -->
-<div class="file-modal" *ngIf="showFileModal">
-    <div class="file-modal-overlay" (click)="closeFileModal()"></div>
-    <div class="file-modal-content">
-        <div class="file-modal-header">
-            <h5 class="file-modal-title">{{ getFileTypeLabel(selectedFileType!) }}</h5>
-            <button type="button" class="btn-close" (click)="closeFileModal()"></button>
-        </div>
-        <div class="file-modal-body">
-            <!-- Contenu du fichier PDF -->
-            <div class="pdf-container" *ngIf="isFileType(selectedFile, 'pdf')">
-                <object [data]="safePdfUrl" type="application/pdf" width="100%" height="500">
-                    <p>Impossible d'afficher le PDF. <a [href]="selectedFile" target="_blank">Télécharger le PDF</a></p>
-                </object>
-            </div>
-            
-            <!-- Image (png, jpg, jpeg) -->
-            <div class="image-container" *ngIf="isFileType(selectedFile, 'image')">
-                <img [src]="selectedFile" alt="Image du document" class="img-fluid">
-            </div>
-            
-            <!-- Autres types de fichiers ou en cas d'erreur -->
-            <div class="file-download" *ngIf="selectedFile && !isFileType(selectedFile, 'pdf') && !isFileType(selectedFile, 'image')">
-                <p class="text-center">
-                    <i class="fas fa-file fa-3x mb-3 text-primary"></i><br>
-                    Ce type de fichier ne peut pas être prévisualisé.
-                </p>
-                <a [href]="selectedFile" target="_blank" class="btn btn-primary">
-                    <i class="fas fa-download me-2"></i>Télécharger le fichier
-                </a>
-            </div>
-            
-            <!-- Message d'erreur si le fichier n'est pas accessible -->
-            <div class="alert alert-warning" *ngIf="!selectedFile">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                Le fichier n'est pas accessible. Veuillez vérifier que l'URL est correcte.
-            </div>
-        </div>
-        <div class="file-modal-footer">
-            <a *ngIf="selectedFile" [href]="selectedFile" download class="btn btn-success">
-                <i class="fas fa-download me-2"></i>Télécharger
-            </a>
-            <button type="button" class="btn btn-secondary" (click)="closeFileModal()">
-                <i class="fas fa-times me-2"></i>Fermer
-            </button>
-        </div>
-    </div>
-</div>
+<app-file-preview-modal
+    [showModal]="showFileModal"
+    [selectedFile]="selectedFile"
+    [selectedFileType]="selectedFileType"
+    (closeModalEvent)="closeFileModal()">
+</app-file-preview-modal>
 
 <!-- Modal pour l'analyse IA -->
-<div class="ai-modal" *ngIf="showAIModal">
-    <div class="ai-modal-overlay" [class.loading]="isAIAnalysisLoading" (click)="isAIAnalysisLoading ? $event.preventDefault() : closeAIModal()"></div>
-    <div class="ai-modal-content">
-        <div class="ai-modal-header">
-            <h5 class="ai-modal-title">
-                <i class="fas fa-brain me-2"></i>Analyse des projets par Intelligence Artificielle
-            </h5>
-            <button type="button" class="btn-close" [disabled]="isAIAnalysisLoading" (click)="closeAIModal()"></button>
-        </div>
-        
-        <!-- Loader pendant le chargement -->
-        <div *ngIf="isAIAnalysisLoading" class="ai-modal-body d-flex justify-content-center align-items-center">
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="visually-hidden">Chargement...</span>
-                </div>
-                <h5 class="fw-normal text-muted">Analyse des projets en cours...</h5>
-                <p class="text-muted small">Notre IA évalue les plans d'affaires. Cette opération peut prendre un certains temps, veuillez patienter...</p>
-            </div>
-        </div>
-        
-        <!-- Contenu du modal une fois les données chargées -->
-        <div *ngIf="!isAIAnalysisLoading" class="ai-modal-body">
-            <div class="alert alert-info mb-3">
-                <i class="fas fa-info-circle me-2"></i> 
-                L'IA a analysé les plans d'affaires des projets et les a classés selon leur potentiel.
-            </div>
-            
-            <!-- Tableau des résultats -->
-            <div class="table-responsive">
-                <table class="table table-striped table-hover ai-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col" class="text-center">Rang</th>
-                            <th scope="col">Promoteur</th>
-                            <th scope="col">Projet</th>
-                            <th scope="col" class="text-center">Score</th>
-                            <th scope="col">Recommandations</th>
-                            <th scope="col" class="text-center">Statut</th>
-                            <th scope="col" class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let item of projectsAI">
-                            <td class="text-center fw-bold">{{ item.rang }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-primary text-white me-2 small-avatar">
-                                        {{ item.projet.nom.charAt(0) }}{{ item.projet.prenoms.charAt(0) }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">{{ item.projet.nom }} {{ item.projet.prenoms }}</div>
-                                        <div class="small text-muted">{{ item.projet.email }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge" [ngClass]="{
-                                    'bg-success': item.projet.type_projet === 'En Création',
-                                    'bg-info': item.projet.type_projet === 'En Développement',
-                                    'bg-warning': item.projet.type_projet !== 'En Création' && item.projet.type_projet !== 'En Développement'
-                                }">{{ item.projet.type_projet }}</span>
-                                <div class="small text-muted">{{ item.projet.forme_juridique }}</div>
-                            </td>
-                            <td class="text-center">
-                                <div class="score-badge" [ngClass]="{
-                                    'score-low': item.analyse.note_globale < 40,
-                                    'score-medium': item.analyse.note_globale >= 40 && item.analyse.note_globale < 70,
-                                    'score-high': item.analyse.note_globale >= 70
-                                }">
-                                    {{ item.analyse.note_globale }}/100
-                                </div>
-                            </td>
-                            <td>
-                                <div class="recommendations-text">
-                                    {{ item.analyse.recommandations }}
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <span class="fw-medium" [ngClass]="getProjectStatusClass(item.projet.id)">
-                                    {{ getProjectStatus(item.projet.id) }}
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center">
-                                    <!-- Bouton Valider -->
-                                    <button class="btn btn-sm btn-success me-2" 
-                                            title="Valider ce projet"
-                                            (click)="validateProjectFromAI(item.projet.id)"
-                                            [disabled]="isProcessing || getProjectStatus(item.projet.id) === 'Validé'">
-                                        <i class="fas fa-check me-1"></i>Valider
-                                    </button>
-                                    
-                                    <!-- Bouton Rejeter -->
-                                    <button class="btn btn-sm btn-danger" 
-                                            title="Rejeter ce projet"
-                                            (click)="rejectProjectFromAI(item.projet.id)"
-                                            [disabled]="isProcessing || getProjectStatus(item.projet.id) === 'Rejeté'">
-                                        <i class="fas fa-times me-1"></i>Rejeter
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="ai-modal-footer">
-            <button type="button" class="btn btn-secondary"  
-                    (click)="closeAIModal()">
-                <i class="fas fa-times me-2"></i>Fermer
-            </button>
-        </div>
-    </div>
-</div>
+<app-ai-analysis-modal
+    [showModal]="showAIModal"
+    [isAIAnalysisLoading]="isAIAnalysisLoading"
+    [projectsAI]="projectsAI"
+    [isProcessing]="isProcessing"
+    [getProjectStatus]="getProjectStatus.bind(this)"
+    (closeModalEvent)="closeAIModal()"
+    (validateProjectEvent)="validateProjectFromAI($event)"
+    (rejectProjectEvent)="rejectProjectFromAI($event)">
+</app-ai-analysis-modal>
 
 <!-- Modal de confirmation (Validation/Rejet) -->
-<div class="confirmation-modal" *ngIf="showConfirmModal">
-    <div class="confirmation-modal-overlay" (click)="closeConfirmModal()"></div>
-    <div class="confirmation-modal-content">
-        <div class="confirmation-modal-header" [ngClass]="{'bg-success-subtle': confirmAction === 'Validé', 'bg-danger-subtle': confirmAction === 'Rejeté'}">
-            <h5 class="confirmation-modal-title">
-                <i [class]="confirmAction === 'Validé' ? 'fas fa-check-circle me-2 text-success' : 'fas fa-times-circle me-2 text-danger'"></i>
-                {{ confirmAction === 'Validé' ? 'Validation du projet' : 'Rejet du projet' }}
-            </h5>
-            <button type="button" class="btn-close" (click)="closeConfirmModal()"></button>
-        </div>
-        
-        <div class="confirmation-modal-body">
-            <p class="mb-3">
-                {{ confirmAction === 'Validé' ? 
-                    'Vous êtes sur le point de valider le projet de ' : 
-                    'Vous êtes sur le point de rejeter le projet de ' }}
-                <strong>{{ selectedProject?.nom }} {{ selectedProject?.prenoms }}</strong>.
-            </p>
-            
-            <div class="form-group mb-3">
-                <label for="justification" class="form-label">
-                    {{ confirmAction === 'Validé' ? 
-                        'Veuillez fournir une justification pour cette validation' : 
-                        'Veuillez expliquer les raisons de ce rejet' }}
-                    <span class="text-danger">*</span>
-                </label>
-                <textarea 
-                    id="justification" 
-                    class="form-control" 
-                    [(ngModel)]="justification" 
-                    rows="5" 
-                    placeholder="{{ confirmAction === 'Validé' ? 
-                        'Ex: Projet très prometteur. Nous suggérons d\'établir un plan marketing plus détaillé...' : 
-                        'Ex: Le projet manque de viabilité économique dans le contexte actuel...' }}">
-                </textarea>
-                <small class="text-muted">Cette justification sera enregistrée avec la décision.</small>
-            </div>
-            
-            <div *ngIf="justificationError" class="alert alert-danger">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                Veuillez fournir une justification avant de confirmer.
-            </div>
-        </div>
-        
-        <div class="confirmation-modal-footer">
-            <button 
-                type="button" 
-                class="btn" 
-                [ngClass]="{'btn-success': confirmAction === 'Validé', 'btn-danger': confirmAction === 'Rejeté'}"
-                [disabled]="isProcessing" 
-                (click)="confirmStatusUpdate()">
-                <i [class]="confirmAction === 'Validé' ? 'fas fa-check me-2' : 'fas fa-times me-2'"></i>
-                {{ confirmAction === 'Validé' ? 'Confirmer la validation' : 'Confirmer le rejet' }}
-                <span *ngIf="isProcessing" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
-            </button>
-            <button type="button" class="btn btn-outline-secondary" [disabled]="isProcessing" (click)="closeConfirmModal()">
-                Annuler
-            </button>
-        </div>
-    </div>
-</div>
+<app-confirmation-modal
+    [showModal]="showConfirmModal"
+    [confirmAction]="confirmAction"
+    [selectedProject]="selectedProject"
+    [isProcessing]="isProcessing"
+    [justificationError]="justificationError"
+    (closeModalEvent)="closeConfirmModal()"
+    (confirmStatusEvent)="confirmStatusUpdate($event)">
+</app-confirmation-modal>

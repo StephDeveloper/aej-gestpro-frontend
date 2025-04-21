@@ -1,0 +1,47 @@
+<div class="file-modal" *ngIf="showModal">
+    <div class="file-modal-overlay" (click)="closeModal()"></div>
+    <div class="file-modal-content">
+        <div class="file-modal-header">
+            <h5 class="file-modal-title">{{ getFileTypeLabel(selectedFileType!) }}</h5>
+            <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="file-modal-body">
+            <!-- Contenu du fichier PDF -->
+            <div class="pdf-container" *ngIf="isFileType(selectedFile, 'pdf')">
+                <object [data]="safePdfUrl" type="application/pdf" width="100%" height="500">
+                    <p>Impossible d'afficher le PDF. <a [href]="selectedFile" target="_blank">Télécharger le PDF</a></p>
+                </object>
+            </div>
+            
+            <!-- Image (png, jpg, jpeg) -->
+            <div class="image-container" *ngIf="isFileType(selectedFile, 'image')">
+                <img [src]="selectedFile" alt="Image du document" class="img-fluid">
+            </div>
+            
+            <!-- Autres types de fichiers ou en cas d'erreur -->
+            <div class="file-download" *ngIf="selectedFile && !isFileType(selectedFile, 'pdf') && !isFileType(selectedFile, 'image')">
+                <p class="text-center">
+                    <i class="fas fa-file fa-3x mb-3 text-primary"></i><br>
+                    Ce type de fichier ne peut pas être prévisualisé.
+                </p>
+                <a [href]="selectedFile" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i>Télécharger le fichier
+                </a>
+            </div>
+            
+            <!-- Message d'erreur si le fichier n'est pas accessible -->
+            <div class="alert alert-warning" *ngIf="!selectedFile">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Le fichier n'est pas accessible. Veuillez vérifier que l'URL est correcte.
+            </div>
+        </div>
+        <div class="file-modal-footer">
+            <a *ngIf="selectedFile" [href]="selectedFile" download class="btn btn-success">
+                <i class="fas fa-download me-2"></i>Télécharger
+            </a>
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+                <i class="fas fa-times me-2"></i>Fermer
+            </button>
+        </div>
+    </div>
+</div>

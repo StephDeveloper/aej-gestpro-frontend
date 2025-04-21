@@ -1,0 +1,163 @@
+<!-- Message de chargement -->
+<div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+    </div>
+</div>
+
+<!-- Message d'erreur -->
+<div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+</div>
+
+<!-- Tableau des projets -->
+<div *ngIf="!isLoading && !error" class="card shadow">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 compact-table">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="cursor-pointer" (click)="onSortProjects('nom')">Promoteur</th>
+                        <th class="cursor-pointer" (click)="onSortProjects('type_projet')">Projet</th>
+                        <th class="cursor-pointer" (click)="onSortProjects('statut')">Statut</th>
+                        <th class="cursor-pointer" (click)="onSortProjects('date_creation')">Date de soumission</th>
+                        <th>Documents</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="paginatedProjects.length === 0">
+                        <td colspan="6" class="text-center py-4">
+                            <div class="empty-state">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h5>Aucun projet trouvé</h5>
+                                <p class="text-muted">Essayez de modifier vos critères de recherche</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let project of paginatedProjects">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-primary text-white me-2">
+                                    {{ project.nom.charAt(0) | titlecase }}{{ project.prenoms.charAt(0) | titlecase }}
+                                </div>
+                                <div>
+                                    <div class="fw-medium">{{ getPromoteurFullName(project) | titlecase }}</div>
+                                    <small class="text-muted">{{ project.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="{
+                                'bg-success': project.type_projet === 'En Création',
+                                'bg-info': project.type_projet === 'En Développement',
+                                'bg-warning': project.type_projet !== 'En Création' && project.type_projet !== 'En Développement'
+                            }">{{ project.type_projet }}</span><br>
+                            <small>{{ project.forme_juridique }}</small>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="{
+                                'bg-warning': project.statut === 'en cours',
+                                'bg-success': project.statut === 'Validé',
+                                'bg-danger': project.statut === 'Rejeté'
+                            }">{{ project.statut }}</span>
+                        </td>
+                        <td class="text-center">{{ project.created_at | date:'dd/MM/yyyy' }}</td>
+                        <!-- Colonne des documents -->
+                        <td>
+                            <div class="document-icons">
+                                <span class="doc-icon" title="Voir la CNI"
+                                      *ngIf="project.cni || project.cni_url" 
+                                      (click)="onOpenFileModal(project, 'cni')">
+                                    <i class="fas fa-id-card"></i>
+                                </span>
+                                <span class="doc-icon" title="Voir la pièce d'identité"
+                                      *ngIf="project.piece_identite || project.piece_identite_url" 
+                                      (click)="onOpenFileModal(project, 'piece_identite')">
+                                    <i class="fas fa-passport"></i>
+                                </span>
+                                <span class="doc-icon" title="Voir le plan d'affaires"
+                                      *ngIf="project.plan_affaire || project.plan_affaire_url" 
+                                      (click)="onOpenFileModal(project, 'plan_affaire')">
+                                    <i class="fas fa-file-contract"></i>
+                                </span>
+                            </div>
+                        </td>
+                        <!-- Colonne des actions -->
+                        <td class="text-center">
+                            <div class="action-buttons">
+                                <!-- Bouton Valider -->
+                                <button class="btn btn-success action-btn" 
+                                        title="Valider ce projet"
+                                        *ngIf="project.statut !== 'validé'"
+                                        (click)="onValidateProject(project)"
+                                        [disabled]="project.statut === 'Validé' || project.statut === 'Rejeté'">
+                                    <i class="fas fa-check me-1"></i>Valider
+                                </button>
+                                
+                                <!-- Bouton Rejeter -->
+                                <button class="btn btn-danger action-btn"
+                                        title="Rejeter ce projet"
+                                        *ngIf="project.statut !== 'rejeté'"
+                                        (click)="onRejectProject(project)"
+                                        [disabled]="project.statut === 'Validé' || project.statut === 'Rejeté'">
+                                    <i class="fas fa-times me-1"></i>Rejeter
+                                </button>
+                                
+                                <!-- Afficher un badge si le projet est déjà validé ou rejeté -->
+                                <span *ngIf="project.statut === 'validé'" class="status-badge validated">
+                                    <i class="fas fa-check-circle me-1"></i>Validé
+                                </span>
+                                <span *ngIf="project.statut === 'rejeté'" class="status-badge rejected">
+                                    <i class="fas fa-times-circle me-1"></i>Rejeté
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div *ngIf="filteredProjects.length > 0" class="pagination-container mt-3 d-flex justify-content-between align-items-center">
+            <div class="page-size-selector">
+                <span class="me-2">Afficher</span>
+                <select class="form-select form-select-sm d-inline-block w-auto" 
+                        [(ngModel)]="pageSize" 
+                        (change)="onPageSizeChange(pageSize)">
+                    <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                </select>
+                <span class="ms-2">éléments par page</span>
+            </div>
+            
+            <div class="pagination-info text-muted">
+                Affichage de {{ paginatedProjects.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} 
+                à {{ getEndIndex() }} 
+                sur {{ filteredProjects.length }} projets
+            </div>
+            
+            <nav aria-label="Navigation des pages">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                        <a class="page-link" href="javascript:void(0)" (click)="onPreviousPage()">
+                            <i class="fas fa-chevron-left small"></i>
+                        </a>
+                    </li>
+                    
+                    <li class="page-item" *ngFor="let page of getPageNumbers()" 
+                        [class.active]="page === currentPage">
+                        <a class="page-link" href="javascript:void(0)" (click)="onPageChange(page)">
+                            {{ page }}
+                        </a>
+                    </li>
+                    
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                        <a class="page-link" href="javascript:void(0)" (click)="onNextPage()">
+                            <i class="fas fa-chevron-right small"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
