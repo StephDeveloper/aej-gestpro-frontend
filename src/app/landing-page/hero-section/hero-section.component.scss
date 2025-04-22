@@ -1,0 +1,188 @@
+// Variables
+$primary-color: #3e60d7;
+$primary-light: #5c85e6;
+$primary-dark: #344fb8;
+$text-color: #495057;
+$text-light: #6c757d;
+$light-bg: #f8f9fa;
+$white: #fff;
+$border-color: #e9ecef;
+$danger: #dc3545;
+
+// Hero Section
+.hero-section {
+  // background: url('https://img.freepik.com/free-photo/business-planning-concept-with-wooden-blocks-magnifier-top-view_176474-9524.jpg');
+  background: url('/assets/img/kaiadmin/bg-img/bg-img-3.webp');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  padding: 8rem 0 4rem;
+  position: relative;
+  color: $white;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    z-index: 0;
+  }
+  
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .min-vh-75 {
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hero-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-image {
+    max-width: 100%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+  
+  .btn-primary {
+    background-color: $primary-color;
+    color: $white;
+    border-color: $primary-color;
+    font-weight: 600;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    
+    &:hover, &:focus, &:active {
+      background-color: $primary-dark;
+      border-color: $primary-dark;
+    }
+  }
+  
+  .btn-outline-light {
+    border-width: 2px;
+    font-weight: 600;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: $white;
+    }
+  }
+  
+  .hero-cta {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .hero-section {
+    padding: 7rem 0 3rem;
+    background-attachment: scroll;
+    
+    .hero-title {
+      font-size: 2.4rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+      max-width: 90%;
+    }
+    
+    .min-vh-75 {
+      min-height: 60vh;
+    }
+    
+    .btn-primary, .btn-outline-light {
+      padding: 0.7rem 1.8rem;
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 6rem 0 3rem;
+    
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1rem;
+      max-width: 95%;
+    }
+    
+    .min-vh-75 {
+      min-height: auto;
+      padding: 2rem 0;
+    }
+    
+    .hero-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      
+      .btn {
+        width: 100%;
+        text-align: center;
+        padding: 0.6rem 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section {
+    padding: 5rem 0 2rem;
+    
+    .hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 0.95rem;
+    }
+    
+    .hero-cta {
+      max-width: 100%;
+      
+      .btn {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,321 @@
+// Variables
+$primary-color: #3e60d7;
+$primary-light: #5c85e6;
+$primary-dark: #344fb8;
+$text-color: #495057;
+$text-light: #6c757d;
+$light-bg: #f8f9fa;
+$white: #fff;
+$border-color: #e9ecef;
+$danger: #dc3545;
+
+// Inscription Section
+.inscription-section {
+  background: url('/assets/img/kaiadmin/bg-pattern.svg'), linear-gradient(135deg, #f5f7fa 0%, #ebf0f6 100%);
+  background-repeat: repeat;
+  padding: 5rem 0;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background-color: $white;
+    transform: skewY(-3deg);
+    z-index: 0;
+  }
+  
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: $primary-dark;
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: $primary-light;
+      border-radius: 2px;
+    }
+  }
+  
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: $text-light;
+    max-width: 80%;
+    margin: 2rem auto;
+    font-weight: 400;
+  }
+  
+  .form-container {
+    position: relative;
+    margin-top: 1.5rem;
+    padding: 0 1rem;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      right: -70px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba($primary-light, 0.1);
+      z-index: -1;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -40px;
+      left: -100px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba($primary-light, 0.05);
+      z-index: -1;
+    }
+  }
+}
+
+// Form Styles
+.form-group {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.form-header {
+  background: $primary-color;
+  color: $white;
+  padding: 1.8rem;
+  border-radius: 15px 15px 0 0;
+  margin-bottom: 0;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba($primary-color, 0.15);
+  
+  h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+}
+
+form {
+  background-color: $white;
+  border-radius: 0 0 15px 15px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.form-section-title {
+  color: $primary-dark;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba($border-color, 0.7);
+  
+  i {
+    color: $primary-color;
+  }
+}
+
+.form-section-desc {
+  color: $text-light;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  color: $text-color;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  
+  .text-danger {
+    margin-left: 4px;
+  }
+}
+
+.form-control, .form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+  transition: all 0.2s ease-in-out;
+  background-color: $white;
+  font-size: 1rem;
+  
+  &:focus {
+    border-color: $primary-light;
+    box-shadow: 0 0 0 0.25rem rgba($primary-color, 0.15);
+    outline: 0;
+  }
+  
+  &.is-invalid {
+    border-color: $danger;
+  }
+  
+  &:hover {
+    background-color: rgba($light-bg, 0.95);
+  }
+}
+
+.input-group {
+  .input-group-text {
+    background-color: $primary-color;
+    color: $white;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    padding: 0.75rem 1rem;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+  
+  .form-control {
+    border-radius: 0 8px 8px 0;
+  }
+}
+
+// File input custom styling
+input[type="file"].form-control {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  
+  &::file-selector-button {
+    background-color: $light-bg;
+    color: $text-color;
+    border: none;
+    border-radius: 5px;
+    padding: 0.4rem 1rem;
+    margin-right: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    
+    &:hover {
+      background-color: rgba(235, 235, 235, 1);
+    }
+  }
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 1rem;
+  box-shadow: 0 4px 15px rgba($primary-color, 0.25);
+  transition: all 0.3s ease;
+  
+  &:hover, &:focus, &:active {
+    background-color: $primary-dark;
+    border-color: $primary-dark;
+    box-shadow: 0 6px 20px rgba($primary-color, 0.35);
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    background-color: rgba(100, 131, 226, 1);
+    border-color: rgba(100, 131, 226, 1);
+    box-shadow: none;
+    transform: none;
+  }
+  
+  .fas {
+    font-size: 0.9rem;
+  }
+}
+
+.invalid-feedback {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.form-text {
+  color: $text-light;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+// Submit button section
+.submit-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba($border-color, 0.7);
+  text-align: center;
+}
+
+.submit-msg-success {
+  margin-bottom: 3rem;
+  border-top: 1px solid rgba($border-color, 0.7);
+  text-align: center;
+}
+
+// Responsive
+@media (max-width: 991.98px) {
+  .inscription-section {
+    padding: 4rem 0;
+    
+    .section-title {
+      font-size: 2.2rem;
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .inscription-section {
+    padding: 3rem 0;
+    
+    &::before {
+      top: -40px;
+      height: 100px;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+    }
+    
+    .section-subtitle {
+      font-size: 1rem;
+      max-width: 100%;
+    }
+    
+    form {
+      padding: 1.5rem;
+    }
+  }
+  
+  .form-header {
+    padding: 1.2rem;
+  }
+}
