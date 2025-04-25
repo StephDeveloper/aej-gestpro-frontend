@@ -1,59 +1,66 @@
-# AejGestproFrontend
+# 📊 GestPro
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.4.
+**GestPro** est une plateforme full stack permettant aux promoteurs de soumettre leur plan d'affaires via une landing page, 
+qui sera ensuite analysé automatiquement par une IA (Ollama) côté back-office. Le système fournit des outils d'administration complets, 
+un tableau de bord dynamique, ainsi que des fonctionnalités avancées d'exportation et de génération de documents.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Stack Technique
 
-```bash
-ng serve
+| Côté              | Technologie                                                    |
+|-------------------|----------------------------------------------------------------|
+| Frontend          | Angular 19                                                     |
+| Backend           | Laravel 10                                                     |
+| Base de données   | PostgreSQL                                                     |
+| IA                | Ollama (analyse Plan affaire en PDF + scoring IA)              |
+| Libs JS (Angular) | `jspdf`, `jspdf-autotable`, `xlsx`, `file-saver`, `apexcharts` |
+
+---
+
+## 🧠 Fonctionnalités principales
+
+- Soumission de projets via une landing page
+- Notification par e-mail de réception du projet
+- Page d'inscription d'un administrateur (pour permettre les tests)
+- Authentification JWT pour les administrateurs
+- Tableau de bord dynamique (statistiques, graphiques)
+- Analyse intelligente des plans d'affaires (IA via Ollama)
+- Système de validation/rejet avec notification e-mail
+- Génération de PDF récapitulatif
+- Exportation de données au format Excel (XLSX)
+
+---
+
+## 📁 Architecture
+
+```
+gestpro/
+├── frontend/ (Angular)
+│   ├── environnement/
+│   ├── guards/
+│   ├── interceptors/
+│   ├── components
+│   └── services/
+├── backend/ (Laravel)
+│   ├── app/
+│   ├── routes/
+│   ├── controllers/
+│   ├── Mail
+│   └── config
+└── database/ (PostgreSQL)
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## ⚙️ Installation
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Voir [INSTALLATION.md](./INSTALLATION.md)
 
-```bash
-ng generate component component-name
-```
+## Fonctionnalités
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Voir [FONCTIONNALITES](./FONCTIONNALITÉS.md)
 
-```bash
-ng generate --help
-```
+## 📚 Documentation API
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Voir [API.md](./aej-gestpro.postman_collection.json)
