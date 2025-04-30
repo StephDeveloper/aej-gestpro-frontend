@@ -214,8 +214,8 @@ html, body {
   }
   
   &:disabled {
-    background-color: mix(white, $primary-color, 15%);
-    border-color: mix(white, $primary-color, 15%);
+    background-color: rgba($primary-color, 0.5);
+    border-color: rgba($primary-color, 0.5);
     transform: none;
     box-shadow: none;
   }

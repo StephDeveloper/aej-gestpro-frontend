@@ -140,8 +140,7 @@ export class InscriptionSectionComponent implements OnInit {
       },
       error: (error: any) => {
         console.log('error', error);
-        
-        this.error = error.error.message;
+        this.error = error.error.errors;
       }
     });
   }
