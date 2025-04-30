@@ -261,8 +261,7 @@ export default class DashboardComponent implements OnInit {
       next: (response: any) => {
         if (response.success) {
           this.dashboardData = response.data;
-          console.log('Dashboard data:', this.dashboardData);
-          
+          // console.log('Dashboard data:', this.dashboardData);
           // Mise à jour des graphiques avec les données
           this.updateCharts();
         } else {

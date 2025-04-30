@@ -9,9 +9,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   
   // Ne pas ajouter de token pour les requêtes d'authentification
-  if (req.url.includes('/login') || req.url.includes('/register')) {
-    return next(req);
-  }
+  // if (req.url.includes('/login') || req.url.includes('/register')) {
+  //   return next(req);
+  // }
   
   const token = authService.getToken();
 
@@ -31,7 +31,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         // Le service d'authentification gère la redirection et le nettoyage
         authService.logout();
       }
-      
       return throwError(() => error);
     })
   );

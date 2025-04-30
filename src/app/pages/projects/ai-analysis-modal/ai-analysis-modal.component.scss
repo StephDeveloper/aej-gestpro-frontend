@@ -171,6 +171,75 @@
   }
 }
 
+// Modal de détails
+.ai-details-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1070; // Plus élevé que le modal principal
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .ai-details-content {
+    position: relative;
+    width: 95%;
+    max-width: 900px;
+    max-height: 90vh;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: ai-details-slide-in 0.3s ease-out;
+    
+    @keyframes ai-details-slide-in {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+  
+  // Styles pour les barres de progression
+  .progress {
+    height: 10px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    
+    .progress-bar {
+      border-radius: 5px;
+      transition: width 0.6s ease;
+    }
+  }
+  
+  // Styles pour les cartes de forces et faiblesses
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .card-header {
+      border-radius: 8px 8px 0 0;
+      padding: 0.75rem 1rem;
+    }
+    
+    .list-group-item {
+      padding: 0.5rem 0;
+      
+      i {
+        width: 16px;
+      }
+    }
+  }
+}
+
 // Avatar pour les promoteurs
 .avatar-circle {
   border-radius: 50%;
@@ -203,6 +272,12 @@
       }
     }
   }
+  
+  .ai-details-modal {
+    .row {
+      flex-direction: column;
+    }
+  }
 }
 
 @media (max-width: 768px) {
@@ -217,6 +292,13 @@
         max-width: 150px;
         max-height: 60px;
       }
+    }
+  }
+  
+  .ai-details-modal {
+    .ai-details-content {
+      width: 98%;
+      max-height: 95vh;
     }
   }
 }

@@ -14,6 +14,15 @@ interface ProjectAI {
   analyse: {
     note_globale: number;
     recommandations: string;
+    criteres?: {
+      viabilite_economique: number;
+      innovation: number;
+      conformite_reglementaire: number;
+      strategie_financiere: number;
+      potentiel_croissance: number;
+    };
+    forces?: string[];
+    faiblesses?: string[];
   };
   rang: number;
   statut?: string;
@@ -37,12 +46,15 @@ export class AiAnalysisModalComponent {
   @Output() validateProjectEvent = new EventEmitter<number>();
   @Output() rejectProjectEvent = new EventEmitter<number>();
   
+  selectedProjectDetails: ProjectAI | null = null;
+  showDetailsModal: boolean = false;
+  
   constructor() {}
   
   closeModal(): void {
-    if (this.isAIAnalysisLoading) {
-      return;
-    }
+    // if (this.isAIAnalysisLoading) {
+    //   return;
+    // }
     this.closeModalEvent.emit();
   }
   
@@ -67,5 +79,15 @@ export class AiAnalysisModalComponent {
       return this.getProjectStatus(item.projet.id);
     }
     return item.statut || 'En cours';
+  }
+  
+  showDetails(project: ProjectAI): void {
+    this.selectedProjectDetails = project;
+    this.showDetailsModal = true;
+  }
+  
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedProjectDetails = null;
   }
 }

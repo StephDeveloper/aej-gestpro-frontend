@@ -35,7 +35,7 @@
                             <th scope="col">Promoteur</th>
                             <th scope="col">Projet</th>
                             <th scope="col" class="text-center">Score</th>
-                            <th scope="col">Recommandations</th>
+                            <!-- <th scope="col">Recommandations</th> -->
                             <th scope="col" class="text-center">Statut</th>
                             <th scope="col" class="text-center">Actions</th>
                         </tr>
@@ -71,11 +71,11 @@
                                     {{ item.analyse.note_globale }}/100
                                 </div>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <div class="recommendations-text">
                                     {{ item.analyse.recommandations }}
                                 </div>
-                            </td>
+                            </td> -->
                             <td class="text-center">
                                 <span class="fw-medium" [ngClass]="getProjectStatusClass(getStatus(item))">
                                     {{ getStatus(item) }}
@@ -83,6 +83,13 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center">
+                                    <!-- Bouton Détails -->
+                                    <button class="btn btn-sm btn-info me-2" 
+                                            title="Voir plus de détails"
+                                            (click)="showDetails(item)">
+                                        <i class="fas fa-info-circle me-1"></i>Plus de détails
+                                    </button>
+                                
                                     <!-- Bouton Valider -->
                                     <button class="btn btn-sm btn-success me-2" 
                                             title="Valider ce projet"
@@ -109,6 +116,185 @@
         <div class="ai-modal-footer">
             <button type="button" class="btn btn-secondary"  
                     (click)="closeModal()">
+                <i class="fas fa-times me-2"></i>Fermer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour afficher les détails de l'analyse IA -->
+<div class="ai-details-modal" *ngIf="showDetailsModal && selectedProjectDetails">
+    <div class="ai-modal-overlay" (click)="closeDetailsModal()"></div>
+    <div class="ai-details-content">
+        <div class="ai-modal-header">
+            <h5 class="ai-modal-title">
+                <i class="fas fa-chart-bar me-2"></i>Détails de l'analyse pour {{ selectedProjectDetails.projet.nom }} {{ selectedProjectDetails.projet.prenoms }}
+            </h5>
+            <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>
+        </div>
+        
+        <div class="ai-modal-body">
+            <!-- Score global -->
+            <div class="mb-5">
+                <h6 class="fw-bold mb-3">Score global</h6>
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar" 
+                         [ngClass]="{
+                            'bg-danger': selectedProjectDetails.analyse.note_globale < 40,
+                            'bg-warning': selectedProjectDetails.analyse.note_globale >= 40 && selectedProjectDetails.analyse.note_globale < 70,
+                            'bg-success': selectedProjectDetails.analyse.note_globale >= 70
+                         }"
+                         [style.width.%]="selectedProjectDetails.analyse.note_globale">
+                        {{ selectedProjectDetails.analyse.note_globale }}/100
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Critères d'évaluation -->
+            <div class="mb-5" *ngIf="selectedProjectDetails.analyse.criteres">
+                <h6 class="fw-bold mb-3">Critères d'évaluation</h6>
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Critère</th>
+                            <th class="text-center">Score</th>
+                            <th>Évaluation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="selectedProjectDetails.analyse.criteres.viabilite_economique !== undefined">
+                            <td>Viabilité économique</td>
+                            <td class="text-center">{{ selectedProjectDetails.analyse.criteres.viabilite_economique }}/100</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         [ngClass]="{
+                                            'bg-danger': selectedProjectDetails.analyse.criteres.viabilite_economique < 40,
+                                            'bg-warning': selectedProjectDetails.analyse.criteres.viabilite_economique >= 40 && selectedProjectDetails.analyse.criteres.viabilite_economique < 70,
+                                            'bg-success': selectedProjectDetails.analyse.criteres.viabilite_economique >= 70
+                                         }"
+                                         [style.width.%]="selectedProjectDetails.analyse.criteres.viabilite_economique">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="selectedProjectDetails.analyse.criteres.innovation !== undefined">
+                            <td>Innovation</td>
+                            <td class="text-center">{{ selectedProjectDetails.analyse.criteres.innovation }}/100</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         [ngClass]="{
+                                            'bg-danger': selectedProjectDetails.analyse.criteres.innovation < 40,
+                                            'bg-warning': selectedProjectDetails.analyse.criteres.innovation >= 40 && selectedProjectDetails.analyse.criteres.innovation < 70,
+                                            'bg-success': selectedProjectDetails.analyse.criteres.innovation >= 70
+                                         }"
+                                         [style.width.%]="selectedProjectDetails.analyse.criteres.innovation">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="selectedProjectDetails.analyse.criteres.conformite_reglementaire !== undefined">
+                            <td>Conformité réglementaire</td>
+                            <td class="text-center">{{ selectedProjectDetails.analyse.criteres.conformite_reglementaire }}/100</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         [ngClass]="{
+                                            'bg-danger': selectedProjectDetails.analyse.criteres.conformite_reglementaire < 40,
+                                            'bg-warning': selectedProjectDetails.analyse.criteres.conformite_reglementaire >= 40 && selectedProjectDetails.analyse.criteres.conformite_reglementaire < 70,
+                                            'bg-success': selectedProjectDetails.analyse.criteres.conformite_reglementaire >= 70
+                                         }"
+                                         [style.width.%]="selectedProjectDetails.analyse.criteres.conformite_reglementaire">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="selectedProjectDetails.analyse.criteres.strategie_financiere !== undefined">
+                            <td>Stratégie financière</td>
+                            <td class="text-center">{{ selectedProjectDetails.analyse.criteres.strategie_financiere }}/100</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         [ngClass]="{
+                                            'bg-danger': selectedProjectDetails.analyse.criteres.strategie_financiere < 40,
+                                            'bg-warning': selectedProjectDetails.analyse.criteres.strategie_financiere >= 40 && selectedProjectDetails.analyse.criteres.strategie_financiere < 70,
+                                            'bg-success': selectedProjectDetails.analyse.criteres.strategie_financiere >= 70
+                                         }"
+                                         [style.width.%]="selectedProjectDetails.analyse.criteres.strategie_financiere">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngIf="selectedProjectDetails.analyse.criteres.potentiel_croissance !== undefined">
+                            <td>Potentiel de croissance</td>
+                            <td class="text-center">{{ selectedProjectDetails.analyse.criteres.potentiel_croissance }}/100</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         [ngClass]="{
+                                            'bg-danger': selectedProjectDetails.analyse.criteres.potentiel_croissance < 40,
+                                            'bg-warning': selectedProjectDetails.analyse.criteres.potentiel_croissance >= 40 && selectedProjectDetails.analyse.criteres.potentiel_croissance < 70,
+                                            'bg-success': selectedProjectDetails.analyse.criteres.potentiel_croissance >= 70
+                                         }"
+                                         [style.width.%]="selectedProjectDetails.analyse.criteres.potentiel_croissance">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Forces et faiblesses -->
+            <h6 class="fw-bold mb-4">Points forts et faibles</h6>
+            <div class="row">
+                <!-- Forces -->
+                <div class="col-md-6 mb-4" *ngIf="selectedProjectDetails.analyse.forces && selectedProjectDetails.analyse.forces.length > 0">
+                    <div class="card border-success h-100">
+                        <div class="card-header bg-success bg-opacity-10 text-white fw-bold">
+                            <i class="fas fa-plus-circle me-2"></i> Points forts
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item border-0 py-2" *ngFor="let force of selectedProjectDetails.analyse.forces">
+                                    <i class="fas fa-check-circle text-success me-2"></i>{{ force }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Faiblesses -->
+                <div class="col-md-6 mb-4" *ngIf="selectedProjectDetails.analyse.faiblesses && selectedProjectDetails.analyse.faiblesses.length > 0">
+                    <div class="card border-danger h-100">
+                        <div class="card-header bg-danger bg-opacity-10 text-white fw-bold">
+                            <i class="fas fa-minus-circle me-2"></i> Points faibles
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item border-0 py-2" *ngFor="let faiblesse of selectedProjectDetails.analyse.faiblesses">
+                                    <i class="fas fa-exclamation-circle text-danger me-2"></i>{{ faiblesse }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommandations -->
+            <div class="mb-3">
+                <h6 class="fw-bold mb-3">Recommandations</h6>
+                <div class="card border-info">
+                    <div class="card-body">
+                        <p class="mb-0">{{ selectedProjectDetails.analyse.recommandations }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ai-modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">
                 <i class="fas fa-times me-2"></i>Fermer
             </button>
         </div>
